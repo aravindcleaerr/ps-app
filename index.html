@@ -30,10 +30,10 @@
         #root { height: 100%; width: 100%; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pulse-purple { 0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); } 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); } }
         
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
-        .animate-scale-up { animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-pulse-ring { animation: pulse-purple 2s infinite; }
         
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
@@ -52,28 +52,23 @@
             Camera: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>,
             FileText: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
             Check: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-            Trash: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
-            X: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-            Alert: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Alert: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         };
 
         // --- COMPONENTS ---
         const Modal = ({ isOpen, type, title, message, onClose }) => {
             if (!isOpen) return null;
-            const isSuccess = type === 'success';
             return (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 relative z-10 text-center animate-scale-up">
-                        <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${isSuccess ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                            {isSuccess ? <Icons.Check className="w-8 h-8" /> : <Icons.Alert className="w-8 h-8" />}
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 relative z-10 text-center">
+                        <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                            {type === 'success' ? <Icons.Check className="w-8 h-8" /> : <Icons.Alert className="w-8 h-8" />}
                         </div>
                         <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
                         <p className="text-slate-500 text-sm mb-6">{message}</p>
-                        <button onClick={onClose} className={`w-full py-3 rounded-xl font-bold text-white ${isSuccess ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}>
-                            {isSuccess ? 'Continue' : 'Close'}
-                        </button>
+                        <button onClick={onClose} className={`w-full py-3 rounded-xl font-bold text-white ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>Continue</button>
                     </div>
                 </div>
             );
@@ -116,36 +111,32 @@
             const [status, setStatus] = useState('Pass'); 
             const [scannedData, setScannedData] = useState(null);
             const [photoData, setPhotoData] = useState(null);
+            
+            // AI STATE
+            const [isAnalyzing, setIsAnalyzing] = useState(false);
             const [aiAnalysis, setAiAnalysis] = useState(null);
+            
             const [loading, setLoading] = useState(false);
             const [history, setHistory] = useState(() => {
                 try { return JSON.parse(localStorage.getItem('history') || '[]'); } catch (e) { return []; }
             });
             const [scriptUrl, setScriptUrl] = useState(localStorage.getItem('scriptUrl') || '');
-            
-            // POPUP STATE
-            const [modal, setModal] = useState(null); // { type: 'success'|'error', title: '', message: '' }
+            const [modal, setModal] = useState(null);
             
             const scannerRef = useRef(null);
             const fileRef = useRef(null);
 
             useEffect(() => { localStorage.setItem('batch', batchId); }, [batchId]);
-            
-            // Safe Storage Logic
             useEffect(() => { 
-                try {
-                    localStorage.setItem('history', JSON.stringify(history)); 
-                } catch (e) {
-                    console.warn("Local Storage limit reached. History not saved locally, but upload might have succeeded.");
-                }
+                try { localStorage.setItem('history', JSON.stringify(history)); } 
+                catch (e) { console.warn("Local storage full"); } 
             }, [history]);
-            
             useEffect(() => { localStorage.setItem('scriptUrl', scriptUrl); }, [scriptUrl]);
             useEffect(() => { if(mode !== 'select') localStorage.setItem('app_mode', mode); }, [mode]);
 
             const startScan = () => {
-                setScannedData(null); setPhotoData(null); setStatus('Pass'); setAiAnalysis(null);
-                if (!window.Html5Qrcode) return setModal({ type: 'error', title: 'Error', message: 'Scanner not ready. Check internet.' });
+                setScannedData(null); setPhotoData(null); setStatus('Pass'); setAiAnalysis(null); setIsAnalyzing(false);
+                if (!window.Html5Qrcode) return setModal({ type: 'error', title: 'Error', message: 'Scanner loading...' });
                 
                 setTimeout(() => {
                     const html5QrCode = new window.Html5Qrcode("reader");
@@ -154,15 +145,23 @@
                         (decoded) => {
                             setScannedData(decoded);
                             html5QrCode.stop().then(() => html5QrCode.clear());
+                            
+                            // ADVANCED MODE: Trigger AI Simulation
                             if (mode === 'advanced') {
+                                setIsAnalyzing(true); // Show loader
                                 setTimeout(() => {
-                                    const isDefect = Math.random() > 0.8; 
-                                    setAiAnalysis({ verdict: isDefect ? 'Defect Detected' : 'Visual Pass', confidence: '98.5%', suggestion: isDefect ? 'Reject' : 'Stock' });
+                                    const isDefect = Math.random() > 0.7; // 30% chance of defect
+                                    setAiAnalysis({ 
+                                        verdict: isDefect ? 'Defect Detected' : 'Visual Pass', 
+                                        confidence: isDefect ? '92%' : '99%', 
+                                        suggestion: isDefect ? 'Route to Reject' : 'Stock' 
+                                    });
                                     if(isDefect) setStatus('Reject');
-                                }, 800);
+                                    setIsAnalyzing(false); // Hide loader
+                                }, 1500);
                             }
                         }, () => {}
-                    ).catch(() => setModal({ type: 'error', title: 'Camera Error', message: 'Permission denied or camera not found.' }));
+                    ).catch(() => setModal({ type: 'error', title: 'Camera Error', message: 'Check permissions.' }));
                 }, 100);
             };
 
@@ -172,24 +171,26 @@
                     try {
                         const data = await compressImage(e.target.files[0]);
                         setPhotoData(data);
-                    } catch(err) { setModal({ type: 'error', title: 'Image Error', message: 'Could not process photo.' }); }
+                    } catch(err) { setModal({ type: 'error', title: 'Error', message: 'Image failed.' }); }
                     setLoading(false);
                 }
             };
 
             const upload = async () => {
-                if(!scriptUrl) return setModal({ type: 'error', title: 'Missing Setup', message: 'Please go to Setup tab and paste your Google Script URL.' });
+                if(!scriptUrl) return setModal({ type: 'error', title: 'Setup', message: 'Missing Script URL.' });
                 setLoading(true);
                 
                 const timestamp = new Date().toLocaleString();
                 
-                // Cloud Payload (Full Data)
+                // Ensure AI Tag is sent even if null
+                const finalAiTag = aiAnalysis ? aiAnalysis.verdict : (mode === 'advanced' ? 'Pending Analysis' : 'N/A');
+
                 const cloudPayload = { 
                     data: scannedData, batch: batchId, status: mode === 'basic' ? 'Pass' : status, 
-                    image: photoData, mode: mode, ai_tags: aiAnalysis ? aiAnalysis.verdict : '', timestamp: timestamp 
+                    image: photoData, mode: mode, ai_tags: finalAiTag, timestamp: timestamp 
                 };
-
-                // Local Payload (Safe Data - No Image)
+                
+                // Local Save (No Image)
                 const localPayload = { 
                     data: scannedData, batch: batchId, status: mode === 'basic' ? 'Pass' : status, 
                     image: null, has_photo: !!photoData, mode: mode, timestamp: timestamp 
@@ -197,27 +198,16 @@
 
                 try {
                     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(cloudPayload) });
-                    
-                    // Update Local History safely
-                    const newItem = {...localPayload, id: Date.now(), sync: 'Done'};
-                    setHistory(prev => [newItem, ...prev]);
-                    
-                    // Reset Form
+                    setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Done'}, ...prev]);
                     setScannedData(null); setPhotoData(null); setAiAnalysis(null);
-                    
-                    // SHOW SUCCESS MODAL
-                    setModal({ type: 'success', title: 'Uploaded!', message: 'Data saved to Google Sheets.' });
-
+                    setModal({ type: 'success', title: 'Uploaded', message: 'Data saved.' });
                 } catch (e) {
-                    // On network error, save offline
-                    const newItem = {...localPayload, id: Date.now(), sync: 'Offline'};
-                    setHistory(prev => [newItem, ...prev]);
-                    setModal({ type: 'error', title: 'Network Error', message: 'Saved locally. Check connection.' });
+                    setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Offline'}, ...prev]);
+                    setModal({ type: 'error', title: 'Offline', message: 'Saved locally.' });
                 }
                 setLoading(false);
             };
 
-            // --- SCREEN: MODE SELECT ---
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
@@ -231,13 +221,10 @@
                 );
             }
 
-            // --- MAIN LAYOUT ---
             return (
                 <div className="flex flex-col h-full max-w-md mx-auto bg-slate-50 shadow-2xl md:border md:rounded-xl md:my-4 md:h-[95vh]">
-                    {/* Global Modal */}
                     <Modal isOpen={!!modal} type={modal?.type} title={modal?.title} message={modal?.message} onClose={() => setModal(null)} />
 
-                    {/* Header */}
                     <div className={`p-4 text-white shadow-lg flex justify-between items-center shrink-0 ${mode === 'basic' ? 'bg-blue-600' : mode === 'pro' ? 'bg-slate-800' : 'bg-gradient-to-r from-slate-900 to-purple-900'}`}>
                         <div className="font-bold flex items-center gap-2">
                             {mode === 'basic' && <Icons.Bolt className="w-5 h-5"/>}
@@ -248,15 +235,10 @@
                         <button onClick={() => setMode('select')} className="text-[10px] bg-white/20 px-2 py-1 rounded">SWITCH</button>
                     </div>
 
-                    {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {view === 'scan' && (
                             <div className="animate-fade-in space-y-4 pb-20">
-                                <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                                    <label className="text-xs font-bold text-slate-400 uppercase">Batch ID</label>
-                                    <input type="text" value={batchId} onChange={e => setBatchId(e.target.value)} className="w-full mt-1 p-2 bg-slate-50 border rounded-lg font-mono text-sm outline-none" placeholder="BATCH-001" />
-                                </div>
-
+                                <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase">Batch ID</label><input type="text" value={batchId} onChange={e => setBatchId(e.target.value)} className="w-full mt-1 p-2 bg-slate-50 border rounded-lg font-mono text-sm outline-none" placeholder="BATCH-001" /></div>
                                 <div className="bg-white rounded-xl shadow-sm border overflow-hidden min-h-[320px] relative flex flex-col">
                                     {!scannedData ? (
                                         <div className="flex-1 flex flex-col bg-slate-900">
@@ -271,18 +253,25 @@
                                                 <div className="bg-emerald-100 p-2 rounded-full text-emerald-600"><Icons.Check className="w-5 h-5"/></div>
                                                 <div className="overflow-hidden"><div className="text-xs font-bold text-emerald-600 uppercase">Data</div><div className="font-mono font-bold text-slate-800 break-all">{scannedData}</div></div>
                                             </div>
-                                            {mode === 'advanced' && aiAnalysis && (
-                                                <div className="bg-slate-900 text-slate-300 p-3 rounded-xl text-sm border border-slate-700">
-                                                    <div className="flex justify-between items-center mb-1"><span className="flex items-center gap-2 text-purple-400 font-bold"><Icons.Brain className="w-4 h-4"/> AI Analysis</span><span className="text-xs bg-purple-900 text-purple-300 px-1.5 rounded">{aiAnalysis.confidence}</span></div>
+
+                                            {/* AI LOADING STATE */}
+                                            {mode === 'advanced' && isAnalyzing && (
+                                                <div className="bg-purple-900 text-purple-200 p-4 rounded-xl text-center animate-pulse-ring border border-purple-700 flex flex-col items-center justify-center h-24">
+                                                    <Icons.Brain className="w-6 h-6 animate-bounce mb-2"/>
+                                                    <span className="font-bold text-sm">AI Analyzing...</span>
+                                                </div>
+                                            )}
+
+                                            {mode === 'advanced' && aiAnalysis && !isAnalyzing && (
+                                                <div className="bg-slate-900 text-slate-300 p-3 rounded-xl text-sm border border-slate-700 animate-fade-in">
+                                                    <div className="flex justify-between items-center mb-1"><span className="flex items-center gap-2 text-purple-400 font-bold"><Icons.Brain className="w-4 h-4"/> AI Verdict</span><span className="text-xs bg-purple-900 text-purple-300 px-1.5 rounded">{aiAnalysis.confidence}</span></div>
                                                     <div className="text-white font-medium">{aiAnalysis.verdict}</div>
                                                 </div>
                                             )}
+
                                             {mode !== 'basic' && (
                                                 <>
-                                                    <div>
-                                                        <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Status</label>
-                                                        <div className="grid grid-cols-3 gap-2">{['Pass', 'Rework', 'Reject'].map(s => <button key={s} onClick={() => setStatus(s)} className={`py-2 text-sm rounded-lg font-bold border ${status === s ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-white border-slate-200 text-slate-500'}`}>{s}</button>)}</div>
-                                                    </div>
+                                                    <div><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Status</label><div className="grid grid-cols-3 gap-2">{['Pass', 'Rework', 'Reject'].map(s => <button key={s} onClick={() => setStatus(s)} className={`py-2 text-sm rounded-lg font-bold border ${status === s ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-white border-slate-200 text-slate-500'}`}>{s}</button>)}</div></div>
                                                     <div className="flex-1 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 relative group overflow-hidden min-h-[120px] flex flex-col items-center justify-center">
                                                         {!photoData ? <div onClick={() => fileRef.current.click()} className="text-center cursor-pointer p-4"><Icons.Camera className="w-6 h-6 text-slate-400 mb-1 mx-auto"/><span className="text-xs font-bold text-slate-500">Add Photo</span><input type="file" ref={fileRef} className="hidden" accept="image/*" capture="environment" onChange={handlePhoto}/></div> : <><img src={photoData} className="absolute inset-0 w-full h-full object-cover"/><button onClick={() => setPhotoData(null)} className="absolute bottom-2 right-2 bg-white text-red-600 px-2 py-1 rounded text-xs font-bold shadow">Retake</button></>}
                                                     </div>
@@ -290,37 +279,22 @@
                                             )}
                                             <div className="grid grid-cols-2 gap-3 mt-auto">
                                                 <button onClick={() => setScannedData(null)} className="py-3 rounded-xl font-bold text-slate-500 bg-slate-200">Cancel</button>
-                                                <button onClick={upload} disabled={loading} className="py-3 rounded-xl font-bold text-white bg-blue-600">{loading ? 'Saving...' : 'Upload'}</button>
+                                                <button onClick={upload} disabled={loading || isAnalyzing} className="py-3 rounded-xl font-bold text-white bg-blue-600 disabled:bg-blue-300">{loading ? 'Saving...' : 'Upload'}</button>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
                         )}
-
                         {view === 'history' && (
                             <div className="animate-fade-in space-y-4 pb-20">
                                 <div className="flex justify-between items-center"><h2 className="font-bold text-slate-700">Session Log</h2><div className="flex gap-2">{mode === 'advanced' && history.length > 0 && <button onClick={() => generatePDF(history, batchId)} className="text-purple-600 bg-purple-50 px-3 py-1 rounded-lg text-xs font-bold border border-purple-100">PDF</button>}<button onClick={() => {if(confirm('Clear?')) setHistory([])}} className="text-red-500 bg-red-50 px-3 py-1 rounded-lg text-xs font-bold border border-red-100">Clear</button></div></div>
-                                {history.map((item, i) => (
-                                    <div key={i} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex justify-between items-start">
-                                        <div><div className="font-bold text-sm text-slate-800">{item.data}</div><div className="text-xs text-slate-500 mt-1">{item.timestamp.split(',')[1]}</div></div>
-                                        <div className="flex flex-col items-end gap-1">
-                                            <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${item.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-amber-50 text-amber-600 border-amber-200'}`}>{item.status}</div>
-                                            {item.has_photo && <div className="text-[10px] text-slate-400 flex items-center gap-1"><Icons.Camera className="w-3 h-3"/> Photo</div>}
-                                        </div>
-                                    </div>
-                                ))}
+                                {history.map((item, i) => (<div key={i} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex justify-between items-start"><div><div className="font-bold text-sm text-slate-800">{item.data}</div><div className="text-xs text-slate-500 mt-1">{item.timestamp.split(',')[1]}</div></div><div className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${item.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-amber-50 text-amber-600 border-amber-200'}`}>{item.status}</div></div>))}
                             </div>
                         )}
-
-                        {view === 'settings' && (
-                            <div className="animate-fade-in space-y-4 pb-20">
-                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none" rows="4"></textarea></div>
-                            </div>
-                        )}
+                        {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20"><div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none" rows="4"></textarea></div></div>}
                     </div>
 
-                    {/* Footer Nav */}
                     <div className="bg-white border-t border-slate-100 flex justify-around py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wide shrink-0 pb-safe w-full fixed bottom-0 max-w-md md:absolute">
                         <button onClick={() => setView('scan')} className={`flex flex-col items-center gap-1 ${view === 'scan' ? 'text-blue-600' : ''}`}><Icons.Camera className="w-6 h-6"/> Scan</button>
                         <button onClick={() => setView('history')} className={`flex flex-col items-center gap-1 ${view === 'history' ? 'text-blue-600' : ''}`}><Icons.FileText className="w-6 h-6"/> Log</button>
