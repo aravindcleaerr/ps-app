@@ -60,15 +60,15 @@
         const Modal = ({ isOpen, type, title, message, onClose }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 relative z-10 text-center">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 relative z-20 text-center transform transition-all">
                         <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                             {type === 'success' ? <Icons.Check className="w-8 h-8" /> : <Icons.Alert className="w-8 h-8" />}
                         </div>
                         <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
                         <p className="text-slate-500 text-sm mb-6">{message}</p>
-                        <button onClick={onClose} className={`w-full py-3 rounded-xl font-bold text-white ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>Continue</button>
+                        <button onClick={onClose} className={`w-full py-3 rounded-xl font-bold text-white ${type === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}>Continue</button>
                     </div>
                 </div>
             );
@@ -127,10 +127,13 @@
             const fileRef = useRef(null);
 
             useEffect(() => { localStorage.setItem('batch', batchId); }, [batchId]);
+            
+            // Safe Storage Logic
             useEffect(() => { 
                 try { localStorage.setItem('history', JSON.stringify(history)); } 
                 catch (e) { console.warn("Local storage full"); } 
             }, [history]);
+            
             useEffect(() => { localStorage.setItem('scriptUrl', scriptUrl); }, [scriptUrl]);
             useEffect(() => { if(mode !== 'select') localStorage.setItem('app_mode', mode); }, [mode]);
 
@@ -145,44 +148,51 @@
                         (decoded) => {
                             setScannedData(decoded);
                             html5QrCode.stop().then(() => html5QrCode.clear());
-                            
-                            // ADVANCED MODE: Trigger AI Simulation
-                            if (mode === 'advanced') {
-                                setIsAnalyzing(true); // Show loader
-                                setTimeout(() => {
-                                    const isDefect = Math.random() > 0.7; // 30% chance of defect
-                                    setAiAnalysis({ 
-                                        verdict: isDefect ? 'Defect Detected' : 'Visual Pass', 
-                                        confidence: isDefect ? '92%' : '99%', 
-                                        suggestion: isDefect ? 'Route to Reject' : 'Stock' 
-                                    });
-                                    if(isDefect) setStatus('Reject');
-                                    setIsAnalyzing(false); // Hide loader
-                                }, 1500);
-                            }
+                            // NOTE: AI Logic REMOVED from here. Now happens in handlePhoto.
                         }, () => {}
                     ).catch(() => setModal({ type: 'error', title: 'Camera Error', message: 'Check permissions.' }));
                 }, 100);
             };
 
             const handlePhoto = async (e) => {
-                if(e.target.files[0]) {
-                    setLoading(true);
+                const file = e.target.files[0];
+                if(file) {
+                    setLoading(true); // Show general loading while processing
                     try {
-                        const data = await compressImage(e.target.files[0]);
+                        // 1. Compress Image
+                        const data = await compressImage(file);
                         setPhotoData(data);
-                    } catch(err) { setModal({ type: 'error', title: 'Error', message: 'Image failed.' }); }
+                        
+                        // 2. Trigger AI Logic IF Advanced Mode
+                        if (mode === 'advanced') {
+                            setIsAnalyzing(true); 
+                            // Simulate network delay for AI
+                            setTimeout(() => {
+                                const isDefect = Math.random() > 0.7; // 30% chance of defect
+                                setAiAnalysis({ 
+                                    verdict: isDefect ? 'Defect Detected' : 'Visual Pass', 
+                                    confidence: isDefect ? '92%' : '99%', 
+                                    suggestion: isDefect ? 'Reject' : 'Stock' 
+                                });
+                                if(isDefect) setStatus('Reject');
+                                setIsAnalyzing(false);
+                            }, 1500);
+                        }
+                    } catch(err) { 
+                        setModal({ type: 'error', title: 'Error', message: 'Image failed.' }); 
+                    }
                     setLoading(false);
                 }
             };
 
             const upload = async () => {
+                // Validation
                 if(!scriptUrl) return setModal({ type: 'error', title: 'Setup', message: 'Missing Script URL.' });
+                if(loading || isAnalyzing) return; // Prevent double click
+
                 setLoading(true);
                 
                 const timestamp = new Date().toLocaleString();
-                
-                // Ensure AI Tag is sent even if null
                 const finalAiTag = aiAnalysis ? aiAnalysis.verdict : (mode === 'advanced' ? 'Pending Analysis' : 'N/A');
 
                 const cloudPayload = { 
@@ -190,22 +200,27 @@
                     image: photoData, mode: mode, ai_tags: finalAiTag, timestamp: timestamp 
                 };
                 
-                // Local Save (No Image)
                 const localPayload = { 
                     data: scannedData, batch: batchId, status: mode === 'basic' ? 'Pass' : status, 
                     image: null, has_photo: !!photoData, mode: mode, timestamp: timestamp 
                 };
 
                 try {
+                    // Use standard fetch
                     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(cloudPayload) });
+                    
+                    // On success (or no-cors success assumption)
                     setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Done'}, ...prev]);
                     setScannedData(null); setPhotoData(null); setAiAnalysis(null);
-                    setModal({ type: 'success', title: 'Uploaded', message: 'Data saved.' });
+                    
+                    setModal({ type: 'success', title: 'Uploaded', message: 'Data saved successfully.' });
                 } catch (e) {
+                    console.error("Upload failed", e);
                     setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Offline'}, ...prev]);
-                    setModal({ type: 'error', title: 'Offline', message: 'Saved locally.' });
+                    setModal({ type: 'error', title: 'Offline', message: 'Network error. Saved locally.' });
+                } finally {
+                    setLoading(false);
                 }
-                setLoading(false);
             };
 
             if (mode === 'select') {
@@ -258,7 +273,7 @@
                                             {mode === 'advanced' && isAnalyzing && (
                                                 <div className="bg-purple-900 text-purple-200 p-4 rounded-xl text-center animate-pulse-ring border border-purple-700 flex flex-col items-center justify-center h-24">
                                                     <Icons.Brain className="w-6 h-6 animate-bounce mb-2"/>
-                                                    <span className="font-bold text-sm">AI Analyzing...</span>
+                                                    <span className="font-bold text-sm">AI Analyzing Photo...</span>
                                                 </div>
                                             )}
 
