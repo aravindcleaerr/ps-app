@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProdSync v3</title>
+    <title>ProdSync v3.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -30,17 +30,9 @@
         #root { height: 100%; width: 100%; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
-        
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-        
-        /* Custom Scrollbar */
         textarea::-webkit-scrollbar { width: 4px; }
-        textarea::-webkit-scrollbar-track { background: #f1f5f9; }
-        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -77,8 +69,8 @@
                         <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${type === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                             {type === 'success' ? <Icons.Check className="w-8 h-8" /> : <Icons.Alert className="w-8 h-8" />}
                         </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
-                        <p className="text-slate-500 text-sm mb-6 leading-relaxed">{message}</p>
+                        <h3 className="text-xl font-bold text-slate-800 mb-2">{String(title)}</h3>
+                        <p className="text-slate-500 text-sm mb-6 leading-relaxed">{String(message)}</p>
                         <button onClick={onClose} className={`w-full py-3.5 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95 ${type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}`}>Continue</button>
                     </div>
                 </div>
@@ -102,7 +94,7 @@
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 z-[300] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-fade-in">
-                    <div className={`w-full max-w-xs bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700 ${error ? 'animate-shake' : ''}`}>
+                    <div className={`w-full max-w-xs bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700`}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-white font-bold text-lg flex items-center gap-2"><Icons.Lock className="w-5 h-5 text-blue-400"/> Admin Access</h3>
                             <button onClick={onClose} className="text-slate-400 hover:text-white"><Icons.X className="w-6 h-6"/></button>
@@ -127,13 +119,13 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 800;
+                    const MAX_SIZE = 600; // Reduced to 600 to prevent OOM crash
                     let w = img.width, h = img.height;
                     if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } } 
                     else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    resolve(canvas.toDataURL('image/jpeg', 0.5)); // Quality 0.5
                 };
             };
         });
@@ -151,10 +143,7 @@
         // --- MAIN APP ---
         function App() {
             const [mode, setMode] = useState(localStorage.getItem('app_mode') || 'select'); 
-            
-            // NEW: Process Type (Outward vs Inward)
-            const [processType, setProcessType] = useState('outward'); // 'outward' or 'inward'
-
+            const [processType, setProcessType] = useState('outward'); 
             const [view, setView] = useState('scan');
             const [batchId, setBatchId] = useState(localStorage.getItem('batch') || '');
             const [operator, setOperator] = useState(localStorage.getItem('operator') || '');
@@ -165,18 +154,19 @@
             const [scannedData, setScannedData] = useState(null);
             const [photoData, setPhotoData] = useState(null);
             
-            // AI STATE
             const [isAnalyzing, setIsAnalyzing] = useState(false);
             const [aiAnalysis, setAiAnalysis] = useState(null);
             
             const [loading, setLoading] = useState(false);
             const [history, setHistory] = useState(() => {
-                try { return JSON.parse(localStorage.getItem('history') || '[]'); } catch (e) { return []; }
+                try { 
+                    const h = JSON.parse(localStorage.getItem('history') || '[]'); 
+                    return Array.isArray(h) ? h.filter(i => i && i.data) : []; // Filter out corrupt data
+                } catch (e) { return []; }
             });
             const [scriptUrl, setScriptUrl] = useState(localStorage.getItem('scriptUrl') || '');
             const [modal, setModal] = useState(null);
             
-            // ADMIN STATE
             const [showAdmin, setShowAdmin] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
 
@@ -203,18 +193,13 @@
                 setPendingAction(null);
             };
 
-            // Update status options when processType changes
             useEffect(() => {
-                if (processType === 'inward') {
-                    setStatus('Field Return');
-                } else {
-                    setStatus('Pass');
-                }
+                if (processType === 'inward') setStatus('Field Return');
+                else setStatus('Pass');
             }, [processType]);
 
             const startScan = () => {
                 if (!batchId && processType === 'outward') return setModal({ type: 'error', title: 'Batch ID Missing', message: 'Please enter a Batch ID.' });
-                
                 setScannedData(null); setPhotoData(null); 
                 setStatus(processType === 'inward' ? 'Field Return' : 'Pass'); 
                 setAiAnalysis(null); setIsAnalyzing(false); setComment('');
@@ -269,37 +254,33 @@
                     incharge: incharge, 
                     status: status, 
                     mode: mode, 
-                    process_type: processType, // Send 'outward' or 'inward'
+                    process_type: processType, 
                     ai_tags: finalAiTag, 
                     timestamp: timestamp, 
                     comment: comment 
                 };
 
                 const cloudPayload = { ...payloadCommon, image: photoData };
+                // Prevent history bloat crash by stripping image
                 const localPayload = { ...payloadCommon, image: null, has_photo: !!photoData };
 
                 try {
                     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(cloudPayload) });
-                    setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Done'}, ...prev]);
+                    setHistory(prev => [{...localPayload, id: Math.random().toString(36).substr(2, 9), sync: 'Done'}, ...prev]);
                     setScannedData(null); setPhotoData(null); setAiAnalysis(null); setComment('');
-                    setModal({ type: 'success', title: 'Uploaded', message: `${processType === 'outward' ? 'Outward' : 'Inward'} scan saved.` });
+                    setModal({ type: 'success', title: 'Uploaded', message: String(`${processType === 'outward' ? 'Outward' : 'Inward'} scan saved.`) });
                 } catch (e) {
-                    setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Offline'}, ...prev]);
+                    setHistory(prev => [{...localPayload, id: Math.random().toString(36).substr(2, 9), sync: 'Offline'}, ...prev]);
                     setModal({ type: 'error', title: 'Connection Failed', message: 'Saved to local history.' });
                 } finally {
                     setLoading(false);
                 }
             };
 
-            // MODE SELECTION SCREEN
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
-                        <div className="text-center mb-10">
-                            <div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div>
-                            <h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3</h1>
-                            <p className="text-slate-400">Select Role Level</p>
-                        </div>
+                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3</h1><p className="text-slate-400">Select Role Level</p></div>
                         <div className="space-y-4 max-w-md mx-auto w-full pb-10">
                             <div onClick={() => setMode('basic')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-blue-500 border-transparent"><div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><Icons.Bolt /></div><div><h3 className="font-bold text-lg">Basic Tracker</h3><p className="text-xs text-slate-400">Scan & Log only.</p></div></div>
                             <div onClick={() => setMode('pro')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-green-500 border-transparent"><div className="p-3 bg-green-500/20 rounded-lg text-green-400"><Icons.Shield /></div><div><h3 className="font-bold text-lg">Pro Inspector</h3><p className="text-xs text-slate-400">Photo + QC Status.</p></div></div>
@@ -309,7 +290,6 @@
                 );
             }
 
-            // COLOR THEME BASED ON PROCESS
             const themeColor = processType === 'outward' ? 'blue' : 'orange';
             const themeBg = processType === 'outward' ? 'bg-blue-600' : 'bg-orange-600';
             const themeBorder = processType === 'outward' ? 'border-blue-500' : 'border-orange-500';
@@ -319,49 +299,31 @@
                     <Modal isOpen={!!modal} type={modal?.type} title={modal?.title} message={modal?.message} onClose={() => setModal(null)} />
                     <AdminGate isOpen={showAdmin} onClose={() => setShowAdmin(false)} onSuccess={onAdminSuccess} />
 
-                    {/* HEADER with TOGGLE */}
                     <div className={`p-4 text-white shadow-lg shrink-0 ${themeBg} transition-colors duration-300`}>
                         <div className="flex justify-between items-center mb-3">
-                            <div className="font-bold flex items-center gap-2">
-                                <div className="bg-white/20 p-1 rounded"><Icons.Logo className="w-4 h-4" /></div>
-                                <span className="tracking-wider text-sm">ProdSync {mode.toUpperCase()}</span>
-                            </div>
+                            <div className="font-bold flex items-center gap-2"><div className="bg-white/20 p-1 rounded"><Icons.Logo className="w-4 h-4" /></div><span className="tracking-wider text-sm">ProdSync {mode.toUpperCase()}</span></div>
                             <button onClick={() => requestAdmin('SWITCH_MODE')} className="text-[10px] bg-black/20 hover:bg-black/30 px-2 py-1 rounded flex items-center gap-1"><Icons.Lock className="w-3 h-3" /> ROLE</button>
                         </div>
-                        
-                        {/* PROCESS TOGGLE */}
                         <div className="flex bg-black/20 p-1 rounded-lg">
-                            <button onClick={() => setProcessType('outward')} className={`flex-1 py-1.5 text-xs font-bold rounded-md flex items-center justify-center gap-1 transition-all ${processType === 'outward' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/70 hover:text-white'}`}>
-                                <Icons.Bolt className="w-3 h-3" /> OUTWARD
-                            </button>
-                            <button onClick={() => setProcessType('inward')} className={`flex-1 py-1.5 text-xs font-bold rounded-md flex items-center justify-center gap-1 transition-all ${processType === 'inward' ? 'bg-white text-orange-600 shadow-sm' : 'text-white/70 hover:text-white'}`}>
-                                <Icons.Repeat className="w-3 h-3" /> INWARD / RETURN
-                            </button>
+                            <button onClick={() => setProcessType('outward')} className={`flex-1 py-1.5 text-xs font-bold rounded-md flex items-center justify-center gap-1 transition-all ${processType === 'outward' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/70 hover:text-white'}`}><Icons.Bolt className="w-3 h-3" /> OUTWARD</button>
+                            <button onClick={() => setProcessType('inward')} className={`flex-1 py-1.5 text-xs font-bold rounded-md flex items-center justify-center gap-1 transition-all ${processType === 'inward' ? 'bg-white text-orange-600 shadow-sm' : 'text-white/70 hover:text-white'}`}><Icons.Repeat className="w-3 h-3" /> INWARD / RETURN</button>
                         </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {view === 'scan' && (
                             <div className="animate-fade-in space-y-4 pb-20">
-                                
-                                {/* SCAN INFO CARD */}
                                 <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-200 space-y-3">
                                     {processType === 'outward' ? (
                                         <>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Batch ID</label>
-                                                <input type="text" value={batchId} onChange={e => setBatchId(e.target.value)} className={`w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono text-sm outline-none focus:${themeBorder} focus:ring-1 focus:ring-${themeColor}-500 transition-all`} placeholder="ENTER-BATCH-ID" />
-                                            </div>
+                                            <div><label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Batch ID</label><input type="text" value={batchId} onChange={e => setBatchId(e.target.value)} className={`w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono text-sm outline-none focus:${themeBorder} focus:ring-1 focus:ring-${themeColor}-500 transition-all`} placeholder="ENTER-BATCH-ID" /></div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div><label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Operator</label><input type="text" value={operator} onChange={e => setOperator(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 transition-all" placeholder="Name" /></div>
                                                 <div><label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Incharge</label><input type="text" value={incharge} onChange={e => setIncharge(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 transition-all" placeholder="Name" /></div>
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="text-center py-2">
-                                            <div className="text-orange-500 font-bold text-sm mb-1">INWARD RETURN MODE</div>
-                                            <div className="text-xs text-slate-400">Scanning items returned from field for repair.</div>
-                                        </div>
+                                        <div className="text-center py-2"><div className="text-orange-500 font-bold text-sm mb-1">INWARD RETURN MODE</div><div className="text-xs text-slate-400">Scanning items returned from field for repair.</div></div>
                                     )}
                                 </div>
 
@@ -377,16 +339,12 @@
                                         <div className="flex-1 flex flex-col p-4 space-y-4 bg-white">
                                             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-start gap-3">
                                                 <div className={`p-2 rounded-full text-white ${themeBg}`}><Icons.Check className="w-5 h-5"/></div>
-                                                <div className="overflow-hidden"><div className="text-xs font-bold text-slate-500 uppercase">Decoded Data</div><div className="font-mono font-bold text-slate-800 break-all">{scannedData}</div></div>
+                                                <div className="overflow-hidden"><div className="text-xs font-bold text-slate-500 uppercase">Decoded Data</div><div className="font-mono font-bold text-slate-800 break-all">{String(scannedData)}</div></div>
                                             </div>
 
-                                            {/* AI BLOCK */}
                                             {mode === 'advanced' && processType === 'outward' && (
                                                 isAnalyzing ? (
-                                                    <div className="bg-purple-50 text-purple-600 p-4 rounded-xl text-center border border-purple-100 flex flex-col items-center justify-center h-20">
-                                                        <Icons.Brain className="w-5 h-5 animate-bounce mb-1"/>
-                                                        <span className="font-bold text-xs">AI Analyzing...</span>
-                                                    </div>
+                                                    <div className="bg-purple-50 text-purple-600 p-4 rounded-xl text-center border border-purple-100 flex flex-col items-center justify-center h-20"><Icons.Brain className="w-5 h-5 animate-bounce mb-1"/><span className="font-bold text-xs">AI Analyzing...</span></div>
                                                 ) : aiAnalysis && (
                                                     <div className="bg-purple-50 text-purple-800 p-3 rounded-xl text-sm border border-purple-100 animate-fade-in">
                                                         <div className="flex justify-between items-center mb-1"><span className="flex items-center gap-2 font-bold"><Icons.Brain className="w-4 h-4"/> AI Verdict</span><span className="text-xs bg-white text-purple-600 px-1.5 rounded border border-purple-100">{aiAnalysis.confidence}</span></div>
@@ -397,7 +355,6 @@
 
                                             {mode !== 'basic' && (
                                                 <>
-                                                    {/* STATUS BUTTONS */}
                                                     <div>
                                                         <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Action Status</label>
                                                         {processType === 'outward' ? (
@@ -406,22 +363,16 @@
                                                                 <button onClick={() => setStatus('Reject')} className={`py-3 text-sm rounded-lg font-bold border transition-colors ${status === 'Reject' ? 'bg-rose-100 border-rose-500 text-rose-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>REJECT</button>
                                                             </div>
                                                         ) : (
-                                                            <div className="w-full">
-                                                                <button disabled className="w-full py-3 text-sm rounded-lg font-bold border bg-orange-100 border-orange-500 text-orange-700">FIELD RETURN</button>
-                                                            </div>
+                                                            <div className="w-full"><button disabled className="w-full py-3 text-sm rounded-lg font-bold border bg-orange-100 border-orange-500 text-orange-700">FIELD RETURN</button></div>
                                                         )}
                                                     </div>
-
                                                     <div className="flex-1 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 relative group overflow-hidden min-h-[120px] flex flex-col items-center justify-center hover:bg-slate-100 transition-colors">
                                                         {!photoData ? <div onClick={() => fileRef.current.click()} className="text-center cursor-pointer p-4 w-full h-full flex flex-col justify-center items-center"><Icons.Camera className="w-6 h-6 text-slate-400 mb-1 mx-auto"/><span className="text-xs font-bold text-slate-500">Add Photo</span><input type="file" ref={fileRef} className="hidden" accept="image/*" capture="environment" onChange={handlePhoto}/></div> : <><img src={photoData} className="absolute inset-0 w-full h-full object-cover"/><button onClick={() => setPhotoData(null)} className="absolute bottom-2 right-2 bg-white text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-rose-100 flex items-center gap-1"><Icons.Trash className="w-3 h-3"/> Retake</button></>}
                                                     </div>
                                                 </>
                                             )}
                                             
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Comments</label>
-                                                <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Optional notes..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea>
-                                            </div>
+                                            <div><label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Comments</label><textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Optional notes..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea></div>
 
                                             <div className="grid grid-cols-2 gap-3 mt-auto pt-2">
                                                 <button onClick={() => setScannedData(null)} className="py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</button>
@@ -441,20 +392,20 @@
                                             <div>
                                                 <div className="font-bold text-sm text-slate-800">{item.data}</div>
                                                 <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
-                                                    <span>{item.timestamp.split(',')[1]}</span>
+                                                    <span>{item.timestamp ? item.timestamp.split(',')[1] : ''}</span>
                                                     <span className={`px-1.5 rounded text-[10px] uppercase font-bold ${item.process_type === 'inward' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{item.process_type === 'inward' ? 'IN' : 'OUT'}</span>
                                                 </div>
                                             </div>
                                             <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${item.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : item.status === 'Reject' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-orange-50 text-orange-600 border-orange-200'}`}>{item.status}</div>
                                         </div>
-                                        {item.comment && <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded border border-slate-100 italic">"{item.comment}"</div>}
+                                        {item.comment && <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded border border-slate-100 italic">"{String(item.comment)}"</div>}
                                     </div>
                                 ))}
                             </div>
                         )}
                         {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20">
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Google Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" rows="4" placeholder="https://script.google.com/..."></textarea></div>
-                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.0</div>
+                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.1</div>
                         </div>}
                     </div>
 
