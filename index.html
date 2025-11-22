@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProdSync Scanner</title>
+    <title>ProdSync v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -31,17 +31,13 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes pulse-purple { 0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); } 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
-        .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
-        .animate-pulse-ring { animation: pulse-purple 2s infinite; }
-        .animate-shake { animation: shake 0.2s ease-in-out 2; }
         
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         
-        /* Custom Scrollbar for textarea */
+        /* Custom Scrollbar */
         textarea::-webkit-scrollbar { width: 4px; }
         textarea::-webkit-scrollbar-track { background: #f1f5f9; }
         textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -64,11 +60,11 @@
             FileText: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
             Check: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
             Alert: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
             Lock: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
             X: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-            Users: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
-            Trash: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Trash: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+            Repeat: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
         };
 
         // --- COMPONENTS ---
@@ -146,18 +142,20 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(20); doc.text("ProdSync Report", 14, 20);
-            doc.setFontSize(10); doc.text(`Batch: ${batchId || 'N/A'} | Generated: ${new Date().toLocaleString()}`, 14, 30);
-            const tableRows = history.map(h => [h.timestamp.split(',')[1], h.data, h.status, h.comment || '-']);
-            doc.autoTable({ startY: 40, head: [["Time", "QR Data", "Status", "Notes"]], body: tableRows, theme: 'grid', headStyles: { fillColor: [79, 70, 229] } });
-            doc.save(`ProdSync_${batchId}_${Date.now()}.pdf`);
+            doc.setFontSize(10); doc.text(`Batch: ${batchId || 'N/A'} | Date: ${new Date().toLocaleDateString()}`, 14, 30);
+            const tableRows = history.map(h => [h.timestamp.split(',')[1], h.type, h.data, h.status]);
+            doc.autoTable({ startY: 40, head: [["Time", "Type", "Data", "Status"]], body: tableRows });
+            doc.save(`ProdSync_Report.pdf`);
         };
 
         // --- MAIN APP ---
         function App() {
             const [mode, setMode] = useState(localStorage.getItem('app_mode') || 'select'); 
-            const [view, setView] = useState('scan');
             
-            // BATCH INFO
+            // NEW: Process Type (Outward vs Inward)
+            const [processType, setProcessType] = useState('outward'); // 'outward' or 'inward'
+
+            const [view, setView] = useState('scan');
             const [batchId, setBatchId] = useState(localStorage.getItem('batch') || '');
             const [operator, setOperator] = useState(localStorage.getItem('operator') || '');
             const [incharge, setIncharge] = useState(localStorage.getItem('incharge') || '');
@@ -205,10 +203,22 @@
                 setPendingAction(null);
             };
 
+            // Update status options when processType changes
+            useEffect(() => {
+                if (processType === 'inward') {
+                    setStatus('Field Return');
+                } else {
+                    setStatus('Pass');
+                }
+            }, [processType]);
+
             const startScan = () => {
-                if (!batchId) return setModal({ type: 'error', title: 'Batch ID Missing', message: 'Please enter a Batch ID before scanning.' });
+                if (!batchId && processType === 'outward') return setModal({ type: 'error', title: 'Batch ID Missing', message: 'Please enter a Batch ID.' });
                 
-                setScannedData(null); setPhotoData(null); setStatus('Pass'); setAiAnalysis(null); setIsAnalyzing(false); setComment('');
+                setScannedData(null); setPhotoData(null); 
+                setStatus(processType === 'inward' ? 'Field Return' : 'Pass'); 
+                setAiAnalysis(null); setIsAnalyzing(false); setComment('');
+                
                 if (!window.Html5Qrcode) return setModal({ type: 'error', title: 'System Error', message: 'Scanner module loading...' });
                 
                 setTimeout(() => {
@@ -219,7 +229,7 @@
                             setScannedData(decoded);
                             html5QrCode.stop().then(() => html5QrCode.clear());
                         }, () => {}
-                    ).catch(() => setModal({ type: 'error', title: 'Camera Access', message: 'Permission denied. Check browser settings.' }));
+                    ).catch(() => setModal({ type: 'error', title: 'Camera Access', message: 'Permission denied.' }));
                 }, 100);
             };
 
@@ -230,22 +240,22 @@
                     try {
                         const data = await compressImage(file);
                         setPhotoData(data);
-                        if (mode === 'advanced') {
+                        if (mode === 'advanced' && processType === 'outward') {
                             setIsAnalyzing(true); 
                             setTimeout(() => {
                                 const isDefect = Math.random() > 0.7; 
-                                setAiAnalysis({ verdict: isDefect ? 'Defect Detected' : 'Visual Pass', confidence: isDefect ? '92%' : '99%', suggestion: isDefect ? 'Reject' : 'Stock' });
+                                setAiAnalysis({ verdict: isDefect ? 'Defect Detected' : 'Visual Pass', confidence: '95%', suggestion: isDefect ? 'Reject' : 'Pass' });
                                 if(isDefect) setStatus('Reject');
                                 setIsAnalyzing(false);
                             }, 1500);
                         }
-                    } catch(err) { setModal({ type: 'error', title: 'Image Error', message: 'Could not process photo.' }); }
+                    } catch(err) { setModal({ type: 'error', title: 'Image Error', message: 'Failed to process.' }); }
                     setLoading(false);
                 }
             };
 
             const upload = async () => {
-                if(!scriptUrl) return setModal({ type: 'error', title: 'Setup Required', message: 'Missing Google Script URL in Setup.' });
+                if(!scriptUrl) return setModal({ type: 'error', title: 'Setup Required', message: 'Missing Google Script URL.' });
                 if(loading || isAnalyzing) return;
 
                 setLoading(true);
@@ -255,10 +265,11 @@
                 const payloadCommon = { 
                     data: scannedData, 
                     batch: batchId, 
-                    operator: operator, // New Field
-                    incharge: incharge, // New Field
-                    status: mode === 'basic' ? 'Pass' : status, 
+                    operator: operator, 
+                    incharge: incharge, 
+                    status: status, 
                     mode: mode, 
+                    process_type: processType, // Send 'outward' or 'inward'
                     ai_tags: finalAiTag, 
                     timestamp: timestamp, 
                     comment: comment 
@@ -271,7 +282,7 @@
                     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(cloudPayload) });
                     setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Done'}, ...prev]);
                     setScannedData(null); setPhotoData(null); setAiAnalysis(null); setComment('');
-                    setModal({ type: 'success', title: 'Uploaded', message: 'Record logged successfully.' });
+                    setModal({ type: 'success', title: 'Uploaded', message: `${processType === 'outward' ? 'Outward' : 'Inward'} scan saved.` });
                 } catch (e) {
                     setHistory(prev => [{...localPayload, id: Date.now(), sync: 'Offline'}, ...prev]);
                     setModal({ type: 'error', title: 'Connection Failed', message: 'Saved to local history.' });
@@ -280,15 +291,14 @@
                 }
             };
 
+            // MODE SELECTION SCREEN
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
                         <div className="text-center mb-10">
-                            <div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">
-                                <Icons.Logo className="w-10 h-10 text-white" />
-                            </div>
-                            <h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync</h1>
-                            <p className="text-slate-400">Production Floor Management</p>
+                            <div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div>
+                            <h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3</h1>
+                            <p className="text-slate-400">Select Role Level</p>
                         </div>
                         <div className="space-y-4 max-w-md mx-auto w-full pb-10">
                             <div onClick={() => setMode('basic')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-blue-500 border-transparent"><div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><Icons.Bolt /></div><div><h3 className="font-bold text-lg">Basic Tracker</h3><p className="text-xs text-slate-400">Scan & Log only.</p></div></div>
@@ -299,42 +309,60 @@
                 );
             }
 
+            // COLOR THEME BASED ON PROCESS
+            const themeColor = processType === 'outward' ? 'blue' : 'orange';
+            const themeBg = processType === 'outward' ? 'bg-blue-600' : 'bg-orange-600';
+            const themeBorder = processType === 'outward' ? 'border-blue-500' : 'border-orange-500';
+
             return (
                 <div className="flex flex-col h-full max-w-md mx-auto bg-slate-50 shadow-2xl md:border md:rounded-xl md:my-4 md:h-[95vh]">
                     <Modal isOpen={!!modal} type={modal?.type} title={modal?.title} message={modal?.message} onClose={() => setModal(null)} />
                     <AdminGate isOpen={showAdmin} onClose={() => setShowAdmin(false)} onSuccess={onAdminSuccess} />
 
-                    {/* Header */}
-                    <div className={`p-4 text-white shadow-lg flex justify-between items-center shrink-0 ${mode === 'basic' ? 'bg-blue-600' : mode === 'pro' ? 'bg-slate-800' : 'bg-gradient-to-r from-slate-900 to-purple-900'}`}>
-                        <div className="font-bold flex items-center gap-3">
-                            <div className="bg-white/20 p-1.5 rounded-lg"><Icons.Logo className="w-5 h-5" /></div>
-                            <div>
-                                <div className="text-xs opacity-80 uppercase tracking-wider">ProdSync</div>
-                                <div className="leading-none">{mode.toUpperCase()}</div>
+                    {/* HEADER with TOGGLE */}
+                    <div className={`p-4 text-white shadow-lg shrink-0 ${themeBg} transition-colors duration-300`}>
+                        <div className="flex justify-between items-center mb-3">
+                            <div className="font-bold flex items-center gap-2">
+                                <div className="bg-white/20 p-1 rounded"><Icons.Logo className="w-4 h-4" /></div>
+                                <span className="tracking-wider text-sm">ProdSync {mode.toUpperCase()}</span>
                             </div>
+                            <button onClick={() => requestAdmin('SWITCH_MODE')} className="text-[10px] bg-black/20 hover:bg-black/30 px-2 py-1 rounded flex items-center gap-1"><Icons.Lock className="w-3 h-3" /> ROLE</button>
                         </div>
-                        <button onClick={() => requestAdmin('SWITCH_MODE')} className="text-[10px] bg-black/20 hover:bg-black/30 px-3 py-1.5 rounded-full flex items-center gap-1 font-medium transition-colors"><Icons.Lock className="w-3 h-3" /> MODE</button>
+                        
+                        {/* PROCESS TOGGLE */}
+                        <div className="flex bg-black/20 p-1 rounded-lg">
+                            <button onClick={() => setProcessType('outward')} className={`flex-1 py-1.5 text-xs font-bold rounded-md flex items-center justify-center gap-1 transition-all ${processType === 'outward' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/70 hover:text-white'}`}>
+                                <Icons.Bolt className="w-3 h-3" /> OUTWARD
+                            </button>
+                            <button onClick={() => setProcessType('inward')} className={`flex-1 py-1.5 text-xs font-bold rounded-md flex items-center justify-center gap-1 transition-all ${processType === 'inward' ? 'bg-white text-orange-600 shadow-sm' : 'text-white/70 hover:text-white'}`}>
+                                <Icons.Repeat className="w-3 h-3" /> INWARD / RETURN
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {view === 'scan' && (
                             <div className="animate-fade-in space-y-4 pb-20">
-                                {/* Batch & Team Info */}
+                                
+                                {/* SCAN INFO CARD */}
                                 <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                                    <div>
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Batch ID</label>
-                                        <input type="text" value={batchId} onChange={e => setBatchId(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" placeholder="ENTER-BATCH-ID" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Operator</label>
-                                            <input type="text" value={operator} onChange={e => setOperator(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 transition-all" placeholder="Name" />
+                                    {processType === 'outward' ? (
+                                        <>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Batch ID</label>
+                                                <input type="text" value={batchId} onChange={e => setBatchId(e.target.value)} className={`w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono text-sm outline-none focus:${themeBorder} focus:ring-1 focus:ring-${themeColor}-500 transition-all`} placeholder="ENTER-BATCH-ID" />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div><label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Operator</label><input type="text" value={operator} onChange={e => setOperator(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 transition-all" placeholder="Name" /></div>
+                                                <div><label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Incharge</label><input type="text" value={incharge} onChange={e => setIncharge(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 transition-all" placeholder="Name" /></div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center py-2">
+                                            <div className="text-orange-500 font-bold text-sm mb-1">INWARD RETURN MODE</div>
+                                            <div className="text-xs text-slate-400">Scanning items returned from field for repair.</div>
                                         </div>
-                                        <div>
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Incharge</label>
-                                            <input type="text" value={incharge} onChange={e => setIncharge(e.target.value)} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 transition-all" placeholder="Name" />
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
 
                                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[320px] relative flex flex-col">
@@ -343,53 +371,61 @@
                                             <div id="reader" className="flex-1 w-full relative">
                                                 {!scannerRef.current && <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500"><Icons.Camera className="w-12 h-12 mb-2 opacity-50"/><p>Camera Ready</p></div>}
                                             </div>
-                                            <button onClick={startScan} className={`py-5 font-bold text-white tracking-wide transition-colors ${mode === 'basic' ? 'bg-blue-600 hover:bg-blue-700' : mode === 'pro' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-purple-600 hover:bg-purple-700'}`}>TAP TO SCAN</button>
+                                            <button onClick={startScan} className={`py-5 font-bold text-white tracking-wide transition-colors ${themeBg} brightness-110 hover:brightness-125`}>TAP TO SCAN</button>
                                         </div>
                                     ) : (
                                         <div className="flex-1 flex flex-col p-4 space-y-4 bg-white">
-                                            <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-start gap-3">
-                                                <div className="bg-emerald-100 p-2 rounded-full text-emerald-600"><Icons.Check className="w-5 h-5"/></div>
-                                                <div className="overflow-hidden"><div className="text-xs font-bold text-emerald-600 uppercase">Decoded Data</div><div className="font-mono font-bold text-slate-800 break-all">{scannedData}</div></div>
+                                            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-start gap-3">
+                                                <div className={`p-2 rounded-full text-white ${themeBg}`}><Icons.Check className="w-5 h-5"/></div>
+                                                <div className="overflow-hidden"><div className="text-xs font-bold text-slate-500 uppercase">Decoded Data</div><div className="font-mono font-bold text-slate-800 break-all">{scannedData}</div></div>
                                             </div>
 
-                                            {mode === 'advanced' && isAnalyzing && (
-                                                <div className="bg-purple-900 text-purple-200 p-4 rounded-xl text-center animate-pulse-ring border border-purple-700 flex flex-col items-center justify-center h-24">
-                                                    <Icons.Brain className="w-6 h-6 animate-bounce mb-2"/>
-                                                    <span className="font-bold text-sm">AI Analyzing...</span>
-                                                </div>
-                                            )}
-
-                                            {mode === 'advanced' && aiAnalysis && !isAnalyzing && (
-                                                <div className="bg-slate-900 text-slate-300 p-3 rounded-xl text-sm border border-slate-700 animate-fade-in">
-                                                    <div className="flex justify-between items-center mb-1"><span className="flex items-center gap-2 text-purple-400 font-bold"><Icons.Brain className="w-4 h-4"/> AI Verdict</span><span className="text-xs bg-purple-900 text-purple-300 px-1.5 rounded">{aiAnalysis.confidence}</span></div>
-                                                    <div className="text-white font-medium">{aiAnalysis.verdict}</div>
-                                                </div>
+                                            {/* AI BLOCK */}
+                                            {mode === 'advanced' && processType === 'outward' && (
+                                                isAnalyzing ? (
+                                                    <div className="bg-purple-50 text-purple-600 p-4 rounded-xl text-center border border-purple-100 flex flex-col items-center justify-center h-20">
+                                                        <Icons.Brain className="w-5 h-5 animate-bounce mb-1"/>
+                                                        <span className="font-bold text-xs">AI Analyzing...</span>
+                                                    </div>
+                                                ) : aiAnalysis && (
+                                                    <div className="bg-purple-50 text-purple-800 p-3 rounded-xl text-sm border border-purple-100 animate-fade-in">
+                                                        <div className="flex justify-between items-center mb-1"><span className="flex items-center gap-2 font-bold"><Icons.Brain className="w-4 h-4"/> AI Verdict</span><span className="text-xs bg-white text-purple-600 px-1.5 rounded border border-purple-100">{aiAnalysis.confidence}</span></div>
+                                                        <div className="font-medium">{aiAnalysis.verdict}</div>
+                                                    </div>
+                                                )
                                             )}
 
                                             {mode !== 'basic' && (
                                                 <>
-                                                    <div><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Quality Status</label><div className="grid grid-cols-3 gap-2">{['Pass', 'Rework', 'Reject'].map(s => <button key={s} onClick={() => setStatus(s)} className={`py-2.5 text-sm rounded-lg font-bold border transition-colors ${status === s ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`}>{s}</button>)}</div></div>
+                                                    {/* STATUS BUTTONS */}
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Action Status</label>
+                                                        {processType === 'outward' ? (
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                <button onClick={() => setStatus('Pass')} className={`py-3 text-sm rounded-lg font-bold border transition-colors ${status === 'Pass' ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>PASS</button>
+                                                                <button onClick={() => setStatus('Reject')} className={`py-3 text-sm rounded-lg font-bold border transition-colors ${status === 'Reject' ? 'bg-rose-100 border-rose-500 text-rose-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>REJECT</button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-full">
+                                                                <button disabled className="w-full py-3 text-sm rounded-lg font-bold border bg-orange-100 border-orange-500 text-orange-700">FIELD RETURN</button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
                                                     <div className="flex-1 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 relative group overflow-hidden min-h-[120px] flex flex-col items-center justify-center hover:bg-slate-100 transition-colors">
-                                                        {!photoData ? <div onClick={() => fileRef.current.click()} className="text-center cursor-pointer p-4 w-full h-full flex flex-col justify-center items-center"><Icons.Camera className="w-6 h-6 text-slate-400 mb-1 mx-auto"/><span className="text-xs font-bold text-slate-500">Add Evidence</span><input type="file" ref={fileRef} className="hidden" accept="image/*" capture="environment" onChange={handlePhoto}/></div> : <><img src={photoData} className="absolute inset-0 w-full h-full object-cover"/><button onClick={() => setPhotoData(null)} className="absolute bottom-2 right-2 bg-white text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-rose-100 flex items-center gap-1"><Icons.Trash className="w-3 h-3"/> Retake</button></>}
+                                                        {!photoData ? <div onClick={() => fileRef.current.click()} className="text-center cursor-pointer p-4 w-full h-full flex flex-col justify-center items-center"><Icons.Camera className="w-6 h-6 text-slate-400 mb-1 mx-auto"/><span className="text-xs font-bold text-slate-500">Add Photo</span><input type="file" ref={fileRef} className="hidden" accept="image/*" capture="environment" onChange={handlePhoto}/></div> : <><img src={photoData} className="absolute inset-0 w-full h-full object-cover"/><button onClick={() => setPhotoData(null)} className="absolute bottom-2 right-2 bg-white text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-rose-100 flex items-center gap-1"><Icons.Trash className="w-3 h-3"/> Retake</button></>}
                                                     </div>
                                                 </>
                                             )}
                                             
-                                            {/* Comment Box */}
                                             <div>
-                                                <label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Operator Notes</label>
-                                                <textarea 
-                                                    value={comment} 
-                                                    onChange={e => setComment(e.target.value)} 
-                                                    placeholder="Optional comments..." 
-                                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" 
-                                                    rows="2"
-                                                ></textarea>
+                                                <label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Comments</label>
+                                                <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Optional notes..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-3 mt-auto pt-2">
                                                 <button onClick={() => setScannedData(null)} className="py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</button>
-                                                <button onClick={upload} disabled={loading || isAnalyzing} className="py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 shadow-lg shadow-blue-200 transition-colors">{loading ? 'Saving...' : 'Confirm Upload'}</button>
+                                                <button onClick={upload} disabled={loading || isAnalyzing} className={`py-3.5 rounded-xl font-bold text-white ${themeBg} brightness-110 hover:brightness-125 disabled:bg-slate-300 shadow-lg transition-colors`}>{loading ? 'Saving...' : 'Upload'}</button>
                                             </div>
                                         </div>
                                     )}
@@ -402,8 +438,14 @@
                                 {history.map((item, i) => (
                                     <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2">
                                         <div className="flex justify-between items-start">
-                                            <div><div className="font-bold text-sm text-slate-800">{item.data}</div><div className="text-xs text-slate-500 mt-0.5">{item.timestamp.split(',')[1]}</div></div>
-                                            <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${item.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-amber-50 text-amber-600 border-amber-200'}`}>{item.status}</div>
+                                            <div>
+                                                <div className="font-bold text-sm text-slate-800">{item.data}</div>
+                                                <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+                                                    <span>{item.timestamp.split(',')[1]}</span>
+                                                    <span className={`px-1.5 rounded text-[10px] uppercase font-bold ${item.process_type === 'inward' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{item.process_type === 'inward' ? 'IN' : 'OUT'}</span>
+                                                </div>
+                                            </div>
+                                            <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${item.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : item.status === 'Reject' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-orange-50 text-orange-600 border-orange-200'}`}>{item.status}</div>
                                         </div>
                                         {item.comment && <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded border border-slate-100 italic">"{item.comment}"</div>}
                                     </div>
@@ -412,14 +454,14 @@
                         )}
                         {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20">
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Google Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" rows="4" placeholder="https://script.google.com/..."></textarea></div>
-                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v2.1 • Built for Industrial Ops</div>
+                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.0</div>
                         </div>}
                     </div>
 
                     <div className="bg-white border-t border-slate-200 flex justify-around py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wide shrink-0 pb-safe w-full fixed bottom-0 max-w-md md:absolute shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                        <button onClick={() => setView('scan')} className={`flex flex-col items-center gap-1 transition-colors ${view === 'scan' ? 'text-blue-600' : 'hover:text-slate-600'}`}><Icons.Camera className="w-6 h-6"/> Scan</button>
-                        <button onClick={() => setView('history')} className={`flex flex-col items-center gap-1 transition-colors ${view === 'history' ? 'text-blue-600' : 'hover:text-slate-600'}`}><Icons.FileText className="w-6 h-6"/> Log</button>
-                        <button onClick={() => requestAdmin('SETUP')} className={`flex flex-col items-center gap-1 transition-colors ${view === 'settings' ? 'text-blue-600' : 'hover:text-slate-600'} relative`}><Icons.Settings className="w-6 h-6"/> Setup <div className="absolute -top-1 -right-1 bg-slate-100 rounded-full p-0.5 border border-slate-200"><Icons.Lock className="w-2 h-2 text-slate-400"/></div></button>
+                        <button onClick={() => setView('scan')} className={`flex flex-col items-center gap-1 transition-colors ${view === 'scan' ? `text-${themeColor}-600` : 'hover:text-slate-600'}`}><Icons.Camera className="w-6 h-6"/> Scan</button>
+                        <button onClick={() => setView('history')} className={`flex flex-col items-center gap-1 transition-colors ${view === 'history' ? `text-${themeColor}-600` : 'hover:text-slate-600'}`}><Icons.FileText className="w-6 h-6"/> Log</button>
+                        <button onClick={() => requestAdmin('SETUP')} className={`flex flex-col items-center gap-1 transition-colors ${view === 'settings' ? `text-${themeColor}-600` : 'hover:text-slate-600'} relative`}><Icons.Settings className="w-6 h-6"/> Setup <div className="absolute -top-1 -right-1 bg-slate-100 rounded-full p-0.5 border border-slate-200"><Icons.Lock className="w-2 h-2 text-slate-400"/></div></button>
                     </div>
                 </div>
             );
