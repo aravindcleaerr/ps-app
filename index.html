@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProdSync v3.3</title>
+    <title>ProdSync v3.4 (High-Res)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -42,14 +42,12 @@
         const { useState, useEffect, useRef } = React;
         const ADMIN_PIN = "8888"; 
         
-        // CONFIG: Common Issues List
         const COMMON_ISSUES = [
             "Damaged Box", "Label Missing", "Scratches/Dents", 
             "Wrong Color", "Missing Parts", "Function Fail", 
             "Rust/Corrosion", "Software Error"
         ];
 
-        // --- ICONS ---
         const Icons = {
             Logo: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/><path d="M12 22V12" strokeOpacity="0.5"/></svg>,
             Bolt: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>,
@@ -59,7 +57,7 @@
             FileText: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
             Check: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
             Alert: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
             Lock: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
             X: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
             Trash: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
@@ -67,7 +65,6 @@
             CloudUpload: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
         };
 
-        // --- COMPONENTS ---
         const Modal = ({ isOpen, type, title, message, onClose }) => {
             if (!isOpen) return null;
             return (
@@ -127,13 +124,13 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 600; // Reduced to 600 to prevent OOM crash
+                    const MAX_SIZE = 600; 
                     let w = img.width, h = img.height;
                     if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } } 
                     else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.5)); // Quality 0.5
+                    resolve(canvas.toDataURL('image/jpeg', 0.5));
                 };
             };
         });
@@ -148,7 +145,6 @@
             doc.save(`ProdSync_Report.pdf`);
         };
 
-        // --- MAIN APP ---
         function App() {
             const [mode, setMode] = useState(localStorage.getItem('app_mode') || 'select'); 
             const [processType, setProcessType] = useState('outward'); 
@@ -156,39 +152,30 @@
             const [batchId, setBatchId] = useState(localStorage.getItem('batch') || '');
             const [operator, setOperator] = useState(localStorage.getItem('operator') || '');
             const [incharge, setIncharge] = useState(localStorage.getItem('incharge') || '');
-            
             const [status, setStatus] = useState('Pass'); 
-            
-            // COMMENTS & TAGS
             const [comment, setComment] = useState('');
             const [selectedTags, setSelectedTags] = useState([]);
-
             const [scannedData, setScannedData] = useState(null);
             const [photoData, setPhotoData] = useState(null);
-            
             const [isAnalyzing, setIsAnalyzing] = useState(false);
             const [aiAnalysis, setAiAnalysis] = useState(null);
-            
             const [loading, setLoading] = useState(false);
             const [history, setHistory] = useState(() => {
                 try { 
                     const h = JSON.parse(localStorage.getItem('history') || '[]'); 
-                    return Array.isArray(h) ? h.filter(i => i && i.data) : []; // Filter out corrupt data
+                    return Array.isArray(h) ? h.filter(i => i && i.data) : []; 
                 } catch (e) { return []; }
             });
             const [scriptUrl, setScriptUrl] = useState(localStorage.getItem('scriptUrl') || '');
             const [modal, setModal] = useState(null);
-            
             const [showAdmin, setShowAdmin] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
-
             const scannerRef = useRef(null);
             const fileRef = useRef(null);
 
             useEffect(() => { localStorage.setItem('batch', batchId); }, [batchId]);
             useEffect(() => { localStorage.setItem('operator', operator); }, [operator]);
             useEffect(() => { localStorage.setItem('incharge', incharge); }, [incharge]);
-            
             useEffect(() => { 
                 try { localStorage.setItem('history', JSON.stringify(history)); } 
                 catch (e) { console.warn("Local storage full"); } 
@@ -210,7 +197,6 @@
                 else setStatus('Pass');
             }, [processType]);
 
-            // Toggle Tags
             const toggleTag = (tag) => {
                 if (selectedTags.includes(tag)) setSelectedTags(selectedTags.filter(t => t !== tag));
                 else setSelectedTags([...selectedTags, tag]);
@@ -227,7 +213,27 @@
                 setTimeout(() => {
                     const html5QrCode = new window.Html5Qrcode("reader");
                     scannerRef.current = html5QrCode;
-                    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                    
+                    // --- HIGH PERFORMANCE SCAN CONFIGURATION ---
+                    const config = { 
+                        fps: 10, 
+                        qrbox: { width: 250, height: 250 },
+                        aspectRatio: 1.0,
+                        experimentalFeatures: {
+                            useBarCodeDetectorIfSupported: true // Uses native Android hardware!
+                        }
+                    };
+                    
+                    const constraints = {
+                        facingMode: "environment",
+                        width: { min: 640, ideal: 1920, max: 3840 }, // Ask for 4K/HD
+                        height: { min: 480, ideal: 1080, max: 2160 },
+                        focusMode: "continuous" // Try to force auto-focus
+                    };
+
+                    html5QrCode.start(
+                        constraints, 
+                        config, 
                         (decoded) => {
                             setScannedData(decoded);
                             html5QrCode.stop().then(() => html5QrCode.clear());
@@ -264,21 +270,12 @@
                 setLoading(true);
                 const timestamp = new Date().toLocaleString();
                 const finalAiTag = aiAnalysis ? aiAnalysis.verdict : (mode === 'advanced' ? 'Pending' : 'N/A');
-
-                // MERGE TAGS + COMMENT
                 const combinedComment = [...selectedTags, comment].filter(Boolean).join(', ');
 
                 const payloadCommon = { 
-                    data: scannedData, 
-                    batch: batchId, 
-                    operator: operator, 
-                    incharge: incharge, 
-                    status: status, 
-                    mode: mode, 
-                    process_type: processType, 
-                    ai_tags: finalAiTag, 
-                    timestamp: timestamp, 
-                    comment: combinedComment // Sending combined string
+                    data: scannedData, batch: batchId, operator: operator, incharge: incharge, 
+                    status: status, mode: mode, process_type: processType, ai_tags: finalAiTag, 
+                    timestamp: timestamp, comment: combinedComment 
                 };
 
                 const cloudPayload = { ...payloadCommon, image: photoData };
@@ -286,11 +283,8 @@
 
                 try {
                     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(cloudPayload) });
-                    
-                    // Play Success Audio
                     const audio = new Audio('https://actions.google.com/sounds/v1/navigation/arrival_message_short.ogg');
                     audio.play().catch(e => console.log("Audio error", e));
-
                     setHistory(prev => [{...localPayload, id: Math.random().toString(36).substr(2, 9), sync: 'Done'}, ...prev]);
                     setScannedData(null); setPhotoData(null); setAiAnalysis(null); setComment(''); setSelectedTags([]);
                     setModal({ type: 'success', title: 'Uploaded', message: String(`${processType === 'outward' ? 'Outward' : 'Inward'} scan saved.`) });
@@ -305,7 +299,7 @@
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
-                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3</h1><p className="text-slate-400">Select Role Level</p></div>
+                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3.4</h1><p className="text-slate-400">High-Res Edition</p></div>
                         <div className="space-y-4 max-w-md mx-auto w-full pb-10">
                             <div onClick={() => setMode('basic')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-blue-500 border-transparent"><div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><Icons.Bolt /></div><div><h3 className="font-bold text-lg">Basic Tracker</h3><p className="text-xs text-slate-400">Scan & Log only.</p></div></div>
                             <div onClick={() => setMode('pro')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-green-500 border-transparent"><div className="p-3 bg-green-500/20 rounded-lg text-green-400"><Icons.Shield /></div><div><h3 className="font-bold text-lg">Pro Inspector</h3><p className="text-xs text-slate-400">Photo + QC Status.</p></div></div>
@@ -323,17 +317,10 @@
                 <div className="flex flex-col h-full max-w-md mx-auto bg-slate-50 shadow-2xl md:border md:rounded-xl md:my-4 md:h-[95vh]">
                     <Modal isOpen={!!modal} type={modal?.type} title={modal?.title} message={modal?.message} onClose={() => setModal(null)} />
                     
-                    {/* Loading Overlay */}
                     {loading && (
                         <div className="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
-                            <div className="relative mb-4">
-                                <div className="w-16 h-16 border-4 border-slate-600 rounded-full"></div>
-                                <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                            <h3 className="text-white font-bold text-lg tracking-wide flex items-center gap-2">
-                                <Icons.CloudUpload className="w-5 h-5" /> Syncing to Cloud...
-                            </h3>
-                            <p className="text-slate-400 text-sm mt-1">Please wait, do not close.</p>
+                            <div className="relative mb-4"><div className="w-16 h-16 border-4 border-slate-600 rounded-full"></div><div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div></div>
+                            <h3 className="text-white font-bold text-lg tracking-wide flex items-center gap-2"><Icons.CloudUpload className="w-5 h-5" /> Syncing...</h3>
                         </div>
                     )}
 
@@ -412,25 +399,8 @@
                                                 </>
                                             )}
                                             
-                                            {/* QUICK ISSUE TAGS */}
-                                            <div className="mb-1">
-                                                <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Quick Notes</label>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {COMMON_ISSUES.map(tag => (
-                                                        <button 
-                                                            key={tag}
-                                                            onClick={() => toggleTag(tag)}
-                                                            className={`px-3 py-1.5 text-[10px] font-bold rounded-full border transition-all ${selectedTags.includes(tag) ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
-                                                        >
-                                                            {tag}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Additional comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea>
-                                            </div>
+                                            <div className="mb-1"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Quick Notes</label><div className="flex flex-wrap gap-2">{COMMON_ISSUES.map(tag => (<button key={tag} onClick={() => toggleTag(tag)} className={`px-3 py-1.5 text-[10px] font-bold rounded-full border transition-all ${selectedTags.includes(tag) ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}>{tag}</button>))}</div></div>
+                                            <div><textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Additional comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea></div>
 
                                             <div className="grid grid-cols-2 gap-3 mt-auto pt-2">
                                                 <button onClick={() => setScannedData(null)} className="py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</button>
@@ -463,7 +433,7 @@
                         )}
                         {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20">
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Google Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" rows="4" placeholder="https://script.google.com/..."></textarea></div>
-                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.1</div>
+                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.4 High-Res</div>
                         </div>}
                     </div>
 
