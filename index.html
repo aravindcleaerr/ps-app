@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProdSync v3.17 (Buttons Fixed)</title>
+    <title>ProdSync v4.0 (Gemini AI)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -30,9 +30,16 @@
         #root { height: 100%; width: 100%; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse-purple { 0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); } 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); } }
+        
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+        .animate-pulse-ring { animation: pulse-purple 2s infinite; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         textarea::-webkit-scrollbar { width: 4px; }
+        
+        /* Accordion transition */
+        .accordion-content { transition: max-height 0.3s ease-out; overflow: hidden; max-height: 0; }
+        .accordion-content.open { max-height: 500px; }
     </style>
 </head>
 <body>
@@ -41,9 +48,8 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         const ADMIN_PIN = "8888"; 
-        
-        // --- CONFIG: NOTES ---
-        // Renamed to match logic to prevent crash
+        const APP_VERSION = "v4.0 AI";
+
         const NOTES_REJECT = [
             "Damaged Box", "Label Missing", "Scratches/Dents", 
             "Wrong Color", "Missing Parts", "Function Fail", 
@@ -71,8 +77,58 @@
             Repeat: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>,
             CloudUpload: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>,
             Keyboard: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="10" y1="12" x2="10" y2="12"></line><line x1="14" y1="12" x2="14" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="6" y1="16" x2="6" y2="16"></line><line x1="10" y1="16" x2="10" y2="16"></line><line x1="14" y1="16" x2="14" y2="16"></line></svg>,
-            StopCircle: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>
+            StopCircle: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>,
+            Info: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
+            ChevronDown: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
+            Sparkles: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
         };
+
+        // --- GEMINI API INTEGRATION ---
+        const callGeminiVision = async (apiKey, base64Image) => {
+            if (!apiKey) throw new Error("API Key missing");
+            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: "Analyze this manufacturing item. Check for defects (scratches, dents, rust, label issues). Return a JSON object with this structure: { \"verdict\": \"Visual Pass\" or \"Defect Detected\", \"confidence\": \"Percentage string\", \"suggestion\": \"Short action\" }" },
+                        { inlineData: { mimeType: "image/jpeg", data: base64Image.split(',')[1] } }
+                    ]
+                }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`Gemini API Error: ${response.status}`);
+            const data = await response.json();
+            const text = data.candidates[0].content.parts[0].text;
+            return JSON.parse(text);
+        };
+        
+        const callGeminiSummary = async (apiKey, logData) => {
+            if (!apiKey) throw new Error("API Key missing");
+            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const prompt = `Analyze this production log and provide a 2-sentence summary of defects and throughput:\n${JSON.stringify(logData)}`;
+
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        };
+
 
         const Modal = ({ isOpen, type, title, message, onClose }) => {
             if (!isOpen) return null;
@@ -80,12 +136,12 @@
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in">
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 relative z-20 text-center transform transition-all border-2 border-white/20">
-                        <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${type === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
-                            {type === 'success' ? <Icons.Check className="w-8 h-8" /> : <Icons.Alert className="w-8 h-8" />}
+                        <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${type === 'success' ? 'bg-emerald-100 text-emerald-600' : type === 'ai' ? 'bg-purple-100 text-purple-600' : 'bg-rose-100 text-rose-600'}`}>
+                            {type === 'success' ? <Icons.Check className="w-8 h-8" /> : type === 'ai' ? <Icons.Sparkles className="w-8 h-8" /> : <Icons.Alert className="w-8 h-8" />}
                         </div>
                         <h3 className="text-xl font-bold text-slate-800 mb-2">{String(title)}</h3>
-                        <p className="text-slate-500 text-sm mb-6 leading-relaxed">{String(message)}</p>
-                        <button onClick={onClose} className={`w-full py-3.5 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95 ${type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}`}>Continue</button>
+                        <p className="text-slate-500 text-sm mb-6 leading-relaxed whitespace-pre-wrap">{String(message)}</p>
+                        <button onClick={onClose} className={`w-full py-3.5 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95 ${type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : type === 'ai' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-rose-600 hover:bg-rose-700'}`}>Continue</button>
                     </div>
                 </div>
             );
@@ -120,6 +176,22 @@
                             {[1,2,3,4,5,6,7,8,9].map(n => (<button key={n} onClick={() => handleNum(n)} className="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xl py-4 rounded-xl transition-colors shadow-lg active:scale-95">{n}</button>))}
                             <div className="col-start-2"><button onClick={() => handleNum(0)} className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-xl py-4 rounded-xl transition-colors shadow-lg active:scale-95">0</button></div>
                         </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // HELP ACCORDION COMPONENT
+        const HelpItem = ({ title, children }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+                <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+                    <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center p-4 text-left font-bold text-slate-700 hover:bg-slate-100">
+                        <span>{title}</span>
+                        <Icons.ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    <div className={`accordion-content bg-white px-4 ${isOpen ? 'open pb-4' : ''}`}>
+                        <div className="pt-2 text-sm text-slate-600 leading-relaxed">{children}</div>
                     </div>
                 </div>
             );
@@ -161,13 +233,16 @@
             const [batchId, setBatchId] = useState(localStorage.getItem('batch') || '');
             const [operator, setOperator] = useState(localStorage.getItem('operator') || '');
             const [incharge, setIncharge] = useState(localStorage.getItem('incharge') || '');
+            
             const [status, setStatus] = useState('Pass'); 
             const [comment, setComment] = useState('');
             const [selectedTags, setSelectedTags] = useState([]);
             const [scannedData, setScannedData] = useState(null);
             const [photoData, setPhotoData] = useState(null);
+            
             const [isAnalyzing, setIsAnalyzing] = useState(false);
             const [aiAnalysis, setAiAnalysis] = useState(null);
+            
             const [loading, setLoading] = useState(false);
             const [history, setHistory] = useState(() => {
                 try { 
@@ -176,6 +251,8 @@
                 } catch (e) { return []; }
             });
             const [scriptUrl, setScriptUrl] = useState(localStorage.getItem('scriptUrl') || '');
+            const [geminiKey, setGeminiKey] = useState(localStorage.getItem('gemini_key') || '');
+            
             const [modal, setModal] = useState(null);
             const [showAdmin, setShowAdmin] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
@@ -185,6 +262,8 @@
             const [isCameraRunning, setIsCameraRunning] = useState(false);
 
             const scannerRef = useRef(null);
+            const fileRef = useRef(null);
+            const isScanningRef = useRef(false);
 
             useEffect(() => { localStorage.setItem('batch', batchId); }, [batchId]);
             useEffect(() => { localStorage.setItem('operator', operator); }, [operator]);
@@ -194,7 +273,19 @@
                 catch (e) { console.warn("Local storage full"); } 
             }, [history]);
             useEffect(() => { localStorage.setItem('scriptUrl', scriptUrl); }, [scriptUrl]);
+            useEffect(() => { localStorage.setItem('gemini_key', geminiKey); }, [geminiKey]);
             useEffect(() => { if(mode !== 'select') localStorage.setItem('app_mode', mode); }, [mode]);
+            
+             useEffect(() => {
+                return () => {
+                    if (scannerRef.current) {
+                        try {
+                            scannerRef.current.stop().then(() => scannerRef.current.clear());
+                        } catch (e) {}
+                    }
+                };
+            }, []);
+
 
             const requestAdmin = (actionType) => { setPendingAction(actionType); setShowAdmin(true); };
             const onAdminSuccess = () => {
@@ -203,6 +294,20 @@
                 if (pendingAction === 'SETUP') setView('settings');
                 if (pendingAction === 'CLEAR_HISTORY') { if(confirm('Confirm: Clear ALL history?')) setHistory([]); }
                 setPendingAction(null);
+            };
+            
+            const generateAiSummary = async () => {
+                 if (!geminiKey) return setModal({ type: 'error', title: 'AI Error', message: 'Please add Gemini API Key in Setup.' });
+                 if (history.length === 0) return setModal({ type: 'error', title: 'Empty Log', message: 'No data to summarize.' });
+                 
+                 setLoading(true);
+                 try {
+                     const summary = await callGeminiSummary(geminiKey, history.slice(0, 20)); // Summarize last 20 items to save tokens
+                     setModal({ type: 'ai', title: 'Shift Summary', message: summary });
+                 } catch (e) {
+                     setModal({ type: 'error', title: 'AI Error', message: 'Could not generate summary. Check API Key.' });
+                 }
+                 setLoading(false);
             };
 
             useEffect(() => {
@@ -225,6 +330,7 @@
                 scannerRef.current = null;
                 setCameraLoading(false);
                 setIsCameraRunning(false);
+                isScanningRef.current = false;
             };
 
             const startScan = () => {
@@ -254,7 +360,6 @@
 
                     html5QrCode.start(constraints, config, 
                         async (decoded) => {
-                            // CRITICAL: STOP BEFORE STATE UPDATE
                             try {
                                 await html5QrCode.stop();
                                 html5QrCode.clear();
@@ -267,6 +372,7 @@
                     ).then(() => {
                         setCameraLoading(false);
                         setIsCameraRunning(true);
+                        isScanningRef.current = true;
                     }).catch((err) => {
                         console.error(err);
                         setModal({ type: 'error', title: 'Camera Access', message: 'Permission denied.' });
@@ -292,14 +398,37 @@
                     try {
                         const data = await compressImage(file);
                         setPhotoData(data);
+                        
+                        // GEMINI INTEGRATION
                         if (mode === 'advanced' && processType === 'outward') {
                             setIsAnalyzing(true); 
-                            setTimeout(() => {
-                                const isDefect = Math.random() > 0.7; 
-                                setAiAnalysis({ verdict: isDefect ? 'Defect Detected' : 'Visual Pass', confidence: '95%', suggestion: isDefect ? 'Reject' : 'Pass' });
-                                if(isDefect) setStatus('Reject');
-                                setIsAnalyzing(false);
-                            }, 1500);
+                            
+                            if (geminiKey) {
+                                try {
+                                    const aiResult = await callGeminiVision(geminiKey, data);
+                                    setAiAnalysis({
+                                        verdict: aiResult.verdict || "Analyzed",
+                                        confidence: aiResult.confidence || "N/A",
+                                        suggestion: aiResult.suggestion || "Review Item"
+                                    });
+                                    // Auto-switch status based on verdict
+                                    if (aiResult.verdict && aiResult.verdict.toLowerCase().includes('defect')) {
+                                        setStatus('Reject');
+                                    }
+                                } catch (aiError) {
+                                    console.error(aiError);
+                                    setModal({ type: 'error', title: 'AI Failed', message: 'Could not analyze image. Check API Key.' });
+                                    // Fallback to simulation if API fails? Or just stop.
+                                }
+                            } else {
+                                // Fallback Simulation if no key
+                                setTimeout(() => {
+                                    const isDefect = Math.random() > 0.7; 
+                                    setAiAnalysis({ verdict: isDefect ? 'Defect Detected' : 'Visual Pass', confidence: '95% (Sim)', suggestion: isDefect ? 'Reject' : 'Pass' });
+                                    if(isDefect) setStatus('Reject');
+                                }, 1500);
+                            }
+                            setIsAnalyzing(false);
                         }
                     } catch(err) { setModal({ type: 'error', title: 'Image Error', message: 'Failed to process.' }); }
                     setLoading(false);
@@ -344,7 +473,7 @@
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
-                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3.17</h1><p className="text-slate-400">Buttons Fixed</p></div>
+                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync</h1><p className="text-slate-400">Select Role Level</p></div>
                         <div className="space-y-4 max-w-md mx-auto w-full pb-10">
                             <div onClick={() => setMode('basic')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-blue-500 border-transparent"><div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><Icons.Bolt /></div><div><h3 className="font-bold text-lg">Basic Tracker</h3><p className="text-xs text-slate-400">Scan & Log only.</p></div></div>
                             <div onClick={() => setMode('pro')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-green-500 border-transparent"><div className="p-3 bg-green-500/20 rounded-lg text-green-400"><Icons.Shield /></div><div><h3 className="font-bold text-lg">Pro Inspector</h3><p className="text-xs text-slate-400">Photo + QC Status.</p></div></div>
@@ -410,11 +539,19 @@
                                             </div>
                                         </div>
                                     ) : !scannedData ? (
-                                        <div className="flex-1 flex flex-col bg-slate-900">
-                                            <div id="reader" className="flex-1 w-full relative">
-                                                {!cameraLoading && !isCameraRunning && <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500"><Icons.Camera className="w-12 h-12 mb-2 opacity-50"/><p>Camera Ready</p></div>}
-                                            </div>
-                                            <div className="flex">
+                                        <div className="flex-1 flex flex-col bg-slate-900 relative">
+                                            {/* CAMERA CONTAINER */}
+                                            <div id="reader" className="flex-1 w-full h-full"></div>
+                                            
+                                            {/* OVERLAY */}
+                                            {!cameraLoading && !isCameraRunning && (
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none">
+                                                    <Icons.Camera className="w-12 h-12 mb-2 opacity-50"/>
+                                                    <p>Camera Ready</p>
+                                                </div>
+                                            )}
+
+                                            <div className="flex relative z-10">
                                                 <button onClick={startScan} disabled={cameraLoading} className={`flex-[2] py-5 font-bold text-white tracking-wide transition-colors ${themeBg} brightness-110 hover:brightness-125 disabled:opacity-90 disabled:cursor-not-allowed flex items-center justify-center gap-2`}>
                                                     {cameraLoading ? (
                                                         <React.Fragment><span>STARTING...</span><span onClick={(e) => { e.stopPropagation(); stopCamera(); }} className="bg-white/20 p-1 rounded-full hover:bg-white/40"><Icons.X className="w-4 h-4"/></span></React.Fragment>
@@ -445,7 +582,7 @@
                                                 )
                                             )}
 
-                                            {/* STATUS BUTTONS MOVED OUTSIDE OF MODE CHECK - NOW VISIBLE IN BASIC */}
+                                            {/* ACTION STATUS - ALWAYS VISIBLE */}
                                             <div>
                                                 <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Action Status</label>
                                                 {processType === 'outward' ? (
@@ -458,13 +595,28 @@
                                                 )}
                                             </div>
 
+                                            {/* PHOTO UI - PRO/ADVANCED ONLY */}
                                             {mode !== 'basic' && (
                                                 <div className="flex-1 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 relative group overflow-hidden min-h-[120px] flex flex-col items-center justify-center hover:bg-slate-100 transition-colors">
-                                                    {!photoData ? <div onClick={() => fileRef.current.click()} className="text-center cursor-pointer p-4 w-full h-full flex flex-col justify-center items-center"><Icons.Camera className="w-6 h-6 text-slate-400 mb-1 mx-auto"/><span className="text-xs font-bold text-slate-500">Add Photo</span><input type="file" ref={fileRef} className="hidden" accept="image/*" capture="environment" onChange={handlePhoto}/></div> : <React.Fragment><img src={photoData} className="absolute inset-0 w-full h-full object-cover"/><button onClick={() => setPhotoData(null)} className="absolute bottom-2 right-2 bg-white text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-rose-100 flex items-center gap-1"><Icons.Trash className="w-3 h-3"/> Retake</button></React.Fragment>}
+                                                    {!photoData ? <div onClick={() => fileRef.current?.click()} className="text-center cursor-pointer p-4 w-full h-full flex flex-col justify-center items-center"><Icons.Camera className="w-6 h-6 text-slate-400 mb-1 mx-auto"/><span className="text-xs font-bold text-slate-500">Add Photo</span><input type="file" ref={fileRef} className="hidden" accept="image/*" capture="environment" onChange={handlePhoto}/></div> : <React.Fragment><img src={photoData} className="absolute inset-0 w-full h-full object-cover"/><button onClick={() => setPhotoData(null)} className="absolute bottom-2 right-2 bg-white text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-rose-100 flex items-center gap-1"><Icons.Trash className="w-3 h-3"/> Retake</button></React.Fragment>}
                                                 </div>
                                             )}
                                             
-                                            <div className="mb-1"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Quick Notes</label><div className="flex flex-wrap gap-2">{activeNotes.map(tag => (<button key={tag} onClick={() => toggleTag(tag)} className={`px-3 py-1.5 text-[10px] font-bold rounded-full border transition-all ${selectedTags.includes(tag) ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}>{tag}</button>))}</div></div>
+                                            {/* NOTES SECTION - ALWAYS VISIBLE IF STATUS IS SELECTED */}
+                                            <div className="mb-1 animate-fade-in">
+                                                <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">{status} Checklist</label>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {activeNotes.map(tag => (
+                                                        <button 
+                                                            key={tag} 
+                                                            onClick={() => toggleTag(tag)} 
+                                                            className={`px-3 py-1.5 text-[10px] font-bold rounded-full border transition-all ${selectedTags.includes(tag) ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                                                        >
+                                                            {tag}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
                                             <div><textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Additional comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea></div>
 
                                             <div className="grid grid-cols-2 gap-3 mt-auto pt-2">
@@ -478,7 +630,9 @@
                         )}
                         {view === 'history' && (
                             <div className="animate-fade-in space-y-4 pb-20">
-                                <div className="flex justify-between items-center"><h2 className="font-bold text-slate-700">Session Log</h2><div className="flex gap-2">{mode === 'advanced' && history.length > 0 && <button onClick={() => generatePDF(history, batchId)} className="text-purple-600 bg-purple-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-100 flex items-center gap-1 hover:bg-purple-50"><Icons.FileText className="w-3 h-3"/> PDF</button>}<button onClick={() => requestAdmin('CLEAR_HISTORY')} className="text-rose-500 bg-rose-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-rose-100 flex items-center gap-1 hover:bg-rose-100"><Icons.Trash className="w-3 h-3"/> Clear</button></div></div>
+                                <div className="flex justify-between items-center"><h2 className="font-bold text-slate-700">Session Log</h2><div className="flex gap-2">
+                                <button onClick={generateAiSummary} className="text-purple-600 bg-purple-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-100 flex items-center gap-1 hover:bg-purple-100"><Icons.Brain className="w-3 h-3"/> AI Summary</button>
+                                {mode === 'advanced' && history.length > 0 && <button onClick={() => generatePDF(history, batchId)} className="text-purple-600 bg-purple-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-purple-100 flex items-center gap-1 hover:bg-purple-50"><Icons.FileText className="w-3 h-3"/> PDF</button>}<button onClick={() => requestAdmin('CLEAR_HISTORY')} className="text-rose-500 bg-rose-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-rose-100 flex items-center gap-1 hover:bg-rose-100"><Icons.Trash className="w-3 h-3"/> Clear</button></div></div>
                                 {history.map((item, i) => (
                                     <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2">
                                         <div className="flex justify-between items-start">
@@ -498,7 +652,31 @@
                         )}
                         {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20">
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Google Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" rows="4" placeholder="https://script.google.com/..."></textarea></div>
-                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.17 Buttons Fixed</div>
+                            
+                            <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Gemini API Key (Optional)</label><input type="password" value={geminiKey} onChange={e => setGeminiKey(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" placeholder="AI Studio Key..." /><p className="text-[10px] text-slate-400 mt-1">Required for AI Visual Inspection & Summaries.</p></div>
+
+                            <div className="mt-6 space-y-3">
+                                <HelpItem title="How to Use">
+                                    <ul className="list-disc pl-4 space-y-1">
+                                        <li><strong>Scan:</strong> Tap 'Tap to Scan' to read QR.</li>
+                                        <li><strong>Status:</strong> Select PASS or REJECT.</li>
+                                        <li><strong>Evidence:</strong> Take photo in Pro mode.</li>
+                                        <li><strong>Upload:</strong> Syncs to Google Sheet immediately.</li>
+                                    </ul>
+                                </HelpItem>
+                                <HelpItem title="Modes Explained">
+                                    <ul className="list-disc pl-4 space-y-1">
+                                        <li><strong>Basic:</strong> Quick scan & log. No photos.</li>
+                                        <li><strong>Pro:</strong> Adds Photo proof & QC status.</li>
+                                        <li><strong>Advanced:</strong> AI-assisted defect detection.</li>
+                                    </ul>
+                                </HelpItem>
+                                <HelpItem title="Troubleshooting">
+                                    <p>If camera freezes: Refresh page or tap Stop Camera. Ensure browser permissions are allowed.</p>
+                                </HelpItem>
+                            </div>
+
+                            <div className="text-center text-xs text-slate-400 mt-8 mb-8">ProdSync {APP_VERSION} • Industrial Operations</div>
                         </div>}
                     </div>
 
