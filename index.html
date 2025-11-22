@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProdSync v3.8 (Self-Healing)</title>
+    <title>ProdSync v3.9 (Stable)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -173,7 +173,10 @@
             const [showAdmin, setShowAdmin] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
             
+            // Camera State
             const [cameraLoading, setCameraLoading] = useState(false);
+            const [isCameraRunning, setIsCameraRunning] = useState(false);
+            
             const [manualMode, setManualMode] = useState(false);
             const [manualInput, setManualInput] = useState('');
 
@@ -210,7 +213,7 @@
             };
 
             // --- FORCE CANCEL SCAN ---
-            const cancelScan = () => {
+            const stopCamera = () => {
                 if(scannerRef.current) {
                     scannerRef.current.stop().then(() => {
                         scannerRef.current.clear();
@@ -218,6 +221,7 @@
                     scannerRef.current = null;
                 }
                 setCameraLoading(false);
+                setIsCameraRunning(false);
             };
 
             const startScan = () => {
@@ -227,6 +231,12 @@
                 setStatus(processType === 'inward' ? 'Field Return' : 'Pass'); 
                 setAiAnalysis(null); setIsAnalyzing(false); setComment(''); setSelectedTags([]);
                 
+                // If camera is already running, stop it (Toggle behavior)
+                if (isCameraRunning) {
+                    stopCamera();
+                    return;
+                }
+
                 // PRE-CLEANUP
                 if(scannerRef.current) {
                     try { scannerRef.current.clear(); } catch(e){}
@@ -239,11 +249,11 @@
 
                 // SAFETY TIMEOUT: Forces reset if camera hangs for > 8 seconds
                 const safetyTimer = setTimeout(() => {
-                    if(scannerRef.current && !scannedData) {
+                    if(scannerRef.current && !scannedData && !isCameraRunning) {
                        setCameraLoading(current => {
-                           if(current) { // If still loading
+                           if(current) { 
                                console.warn("Camera start timed out");
-                               cancelScan();
+                               stopCamera();
                                setModal({ type: 'error', title: 'Timeout', message: 'Camera took too long. Try again.' });
                                return false;
                            }
@@ -260,39 +270,44 @@
                         scannerRef.current = html5QrCode;
                         
                         const config = { fps: 10, qrbox: { width: 250, height: 250 }, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
-                        // Ideal settings
                         const constraints = { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: "continuous" };
 
-                        html5QrCode.start(
-                            constraints, 
-                            config, 
-                            (decoded) => {
-                                clearTimeout(safetyTimer);
-                                setScannedData(decoded);
-                                setCameraLoading(false);
-                                html5QrCode.stop().then(() => { html5QrCode.clear(); scannerRef.current = null; });
-                            }, () => {}
-                        ).catch((err) => {
+                        const onScanSuccess = (decoded) => {
+                            clearTimeout(safetyTimer);
+                            setScannedData(decoded);
+                            setCameraLoading(false);
+                            setIsCameraRunning(false);
+                            html5QrCode.stop().then(() => { html5QrCode.clear(); scannerRef.current = null; });
+                        };
+
+                        html5QrCode.start(constraints, config, onScanSuccess, () => {})
+                        .then(() => {
+                            // SUCCESS: Camera is live
+                            clearTimeout(safetyTimer);
+                            setCameraLoading(false);
+                            setIsCameraRunning(true);
+                        })
+                        .catch((err) => {
                             console.error(err);
                             // Fallback to basic settings
-                            html5QrCode.start(
-                                { facingMode: "environment" }, config, 
-                                (decoded) => {
-                                    clearTimeout(safetyTimer);
-                                    setScannedData(decoded);
-                                    setCameraLoading(false);
-                                    html5QrCode.stop().then(() => { html5QrCode.clear(); scannerRef.current = null; });
-                                }, () => {}
-                            ).catch(() => {
+                            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, () => {})
+                            .then(() => {
+                                clearTimeout(safetyTimer);
+                                setCameraLoading(false);
+                                setIsCameraRunning(true);
+                            })
+                            .catch(() => {
                                 clearTimeout(safetyTimer);
                                 setModal({ type: 'error', title: 'Camera Error', message: 'Could not start camera.' });
                                 setCameraLoading(false);
+                                setIsCameraRunning(false);
                             });
                         });
                     } catch (e) {
                         clearTimeout(safetyTimer);
                         setModal({ type: 'error', title: 'Init Failed', message: e.message });
                         setCameraLoading(false);
+                        setIsCameraRunning(false);
                     }
                 }, 200);
             };
@@ -363,7 +378,7 @@
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
-                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3.8</h1><p className="text-slate-400">Self-Healing Edition</p></div>
+                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3.9</h1><p className="text-slate-400">Self-Healing Edition</p></div>
                         <div className="space-y-4 max-w-md mx-auto w-full pb-10">
                             <div onClick={() => setMode('basic')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-blue-500 border-transparent"><div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><Icons.Bolt /></div><div><h3 className="font-bold text-lg">Basic Tracker</h3><p className="text-xs text-slate-400">Scan & Log only.</p></div></div>
                             <div onClick={() => setMode('pro')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-green-500 border-transparent"><div className="p-3 bg-green-500/20 rounded-lg text-green-400"><Icons.Shield /></div><div><h3 className="font-bold text-lg">Pro Inspector</h3><p className="text-xs text-slate-400">Photo + QC Status.</p></div></div>
@@ -431,15 +446,17 @@
                                     ) : !scannedData ? (
                                         <div className="flex-1 flex flex-col bg-slate-900">
                                             <div id="reader" className="flex-1 w-full relative">
-                                                {!cameraLoading && <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500"><Icons.Camera className="w-12 h-12 mb-2 opacity-50"/><p>Camera Ready</p></div>}
+                                                {!cameraLoading && !isCameraRunning && <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500"><Icons.Camera className="w-12 h-12 mb-2 opacity-50"/><p>Camera Ready</p></div>}
                                             </div>
                                             <div className="flex">
                                                 <button onClick={startScan} disabled={cameraLoading} className={`flex-[2] py-5 font-bold text-white tracking-wide transition-colors ${themeBg} brightness-110 hover:brightness-125 disabled:opacity-90 disabled:cursor-not-allowed flex items-center justify-center gap-2`}>
                                                     {cameraLoading ? (
-                                                        <><span>STARTING...</span><span onClick={(e) => { e.stopPropagation(); cancelScan(); }} className="bg-white/20 p-1 rounded-full hover:bg-white/40"><Icons.X className="w-4 h-4"/></span></>
+                                                        <><span>STARTING...</span><span onClick={(e) => { e.stopPropagation(); stopCamera(); }} className="bg-white/20 p-1 rounded-full hover:bg-white/40"><Icons.X className="w-4 h-4"/></span></>
+                                                    ) : isCameraRunning ? (
+                                                        <><span>STOP CAMERA</span><Icons.StopCircle className="w-5 h-5"/></>
                                                     ) : 'TAP TO SCAN'}
                                                 </button>
-                                                <button onClick={() => setManualMode(true)} disabled={cameraLoading} className="flex-1 bg-slate-800 text-white border-l border-slate-700 flex items-center justify-center hover:bg-slate-700 disabled:opacity-50">
+                                                <button onClick={() => setManualMode(true)} disabled={cameraLoading || isCameraRunning} className="flex-1 bg-slate-800 text-white border-l border-slate-700 flex items-center justify-center hover:bg-slate-700 disabled:opacity-50">
                                                     <Icons.Keyboard className="w-6 h-6" />
                                                 </button>
                                             </div>
@@ -515,7 +532,7 @@
                         )}
                         {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20">
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Google Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" rows="4" placeholder="https://script.google.com/..."></textarea></div>
-                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.8 Self-Healing</div>
+                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.9 Self-Healing</div>
                         </div>}
                     </div>
 
