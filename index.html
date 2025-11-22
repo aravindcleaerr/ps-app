@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProdSync v3.11 (Logic Update)</title>
+    <title>ProdSync v3.12 (Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -173,8 +173,10 @@
             const [showAdmin, setShowAdmin] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
             
+            // Camera State
             const [cameraLoading, setCameraLoading] = useState(false);
             const [isCameraRunning, setIsCameraRunning] = useState(false);
+            
             const [manualMode, setManualMode] = useState(false);
             const [manualInput, setManualInput] = useState('');
 
@@ -239,7 +241,6 @@
                 setTimeout(() => {
                     if(!document.getElementById("reader")) { setCameraLoading(false); return; }
                     
-                    // Hard cleanup before start
                     if(scannerRef.current) { try{scannerRef.current.clear();}catch(e){} scannerRef.current = null; }
 
                     const html5QrCode = new window.Html5Qrcode("reader");
@@ -250,8 +251,19 @@
 
                     html5QrCode.start(constraints, config, 
                         async (decoded) => {
-                            await stopCamera(); // CRITICAL FIX: Stop camera completely before state update
-                            setScannedData(decoded);
+                            // CRITICAL FIX: Stop camera completely BEFORE updating state to show results
+                            try {
+                                await html5QrCode.stop();
+                                html5QrCode.clear();
+                                scannerRef.current = null;
+                                setIsCameraRunning(false);
+                                setCameraLoading(false);
+                                setScannedData(decoded); // Only NOW trigger UI update
+                            } catch (err) {
+                                console.error("Stop error", err);
+                                // Even if stop fails, we force UI update
+                                setScannedData(decoded);
+                            }
                         }, () => {}
                     ).then(() => {
                         setCameraLoading(false);
@@ -332,7 +344,7 @@
             if (mode === 'select') {
                 return (
                     <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-center overflow-y-auto">
-                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3.11</h1><p className="text-slate-400">Logic Updated</p></div>
+                        <div className="text-center mb-10"><div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"><Icons.Logo className="w-10 h-10 text-white" /></div><h1 className="text-3xl font-bold mb-2 tracking-tight">ProdSync v3.12</h1><p className="text-slate-400">Fixed Logic</p></div>
                         <div className="space-y-4 max-w-md mx-auto w-full pb-10">
                             <div onClick={() => setMode('basic')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-blue-500 border-transparent"><div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><Icons.Bolt /></div><div><h3 className="font-bold text-lg">Basic Tracker</h3><p className="text-xs text-slate-400">Scan & Log only.</p></div></div>
                             <div onClick={() => setMode('pro')} className="bg-white/5 p-4 rounded-xl flex items-center gap-4 cursor-pointer border hover:border-green-500 border-transparent"><div className="p-3 bg-green-500/20 rounded-lg text-green-400"><Icons.Shield /></div><div><h3 className="font-bold text-lg">Pro Inspector</h3><p className="text-xs text-slate-400">Photo + QC Status.</p></div></div>
@@ -452,10 +464,21 @@
                                                 </>
                                             )}
                                             
+                                            {/* DYNAMIC COMMENT SECTION */}
                                             {(status === 'Reject' || status === 'Field Return') && (
-                                                <div className="animate-fade-in">
-                                                    <div className="mb-1"><label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Quick Notes</label><div className="flex flex-wrap gap-2">{COMMON_ISSUES.map(tag => (<button key={tag} onClick={() => toggleTag(tag)} className={`px-3 py-1.5 text-[10px] font-bold rounded-full border transition-all ${selectedTags.includes(tag) ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}>{tag}</button>))}</div></div>
-                                                    <div><textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Additional comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea></div>
+                                                <div className="animate-fade-in mt-3">
+                                                    <div className="mb-3">
+                                                        <label className="text-xs font-bold text-slate-400 uppercase mb-2 block">Quick Notes</label>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {COMMON_ISSUES.map(tag => (
+                                                                <button key={tag} onClick={() => toggleTag(tag)} className={`px-3 py-1.5 text-[10px] font-bold rounded-full border transition-all ${selectedTags.includes(tag) ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}>{tag}</button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Detailed Comments</label>
+                                                        <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Enter specific issues..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" rows="2"></textarea>
+                                                    </div>
                                                 </div>
                                             )}
 
@@ -490,7 +513,7 @@
                         )}
                         {view === 'settings' && <div className="animate-fade-in space-y-4 pb-20">
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><label className="text-xs font-bold text-slate-400 uppercase block mb-2">Google Script URL</label><textarea value={scriptUrl} onChange={e => setScriptUrl(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none text-slate-600" rows="4" placeholder="https://script.google.com/..."></textarea></div>
-                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.11 Logic Update</div>
+                            <div className="text-center text-xs text-slate-400 mt-8">ProdSync v3.12 Fixed</div>
                         </div>}
                     </div>
 
